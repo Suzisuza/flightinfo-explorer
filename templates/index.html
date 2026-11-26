@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A simple flight information explorer for arrivals, departures and flight details.">
+    <title>FlightInfo Explorer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='flightinfo_design.css') }}">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="FlightInfo Explorer home">
+        <span class="brand-mark" aria-hidden="true">F</span>
+        <span>FlightInfo <strong>Explorer</strong></span>
+      </a>
+    </header>
+
+    <main class="page-shell">
+      <section class="intro" aria-labelledby="page-title">
+        <header class="page-header">FlightInfo Explorer</header>
+        <div class="intro-heading">
+          <h1 id="page-title">Your flight journey starts here!</h1>
+          <img class="journey-plane" src="{{ url_for('static', filename='images/header-plane.png') }}" alt="" aria-hidden="true">
+        </div>
+        <p class="intro-copy">Explore arrivals, departures and flight details from one place.</p>
+      </section>
+
+      <section class="airport-panel" aria-labelledby="airport-title">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">START YOUR JOURNEY</p>
+            <h2 id="airport-title">Choose an airport</h2>
+          </div>
+          <div class="airport-count-wrap">
+                    <span class="airport-count">10 airports to explore</span>
+            <img class="suitcase-image" src="{{ url_for('static', filename='images/travel-suitcase.png') }}" alt="" aria-hidden="true">
+          </div>
+        </div>
+        <div class="airport-chips" aria-label="Choose an airport">
+          <button class="airport-chip airport-chip-selected" type="button" data-airport="ARN" aria-pressed="true">ARN <small>Arlanda</small></button>
+          <button class="airport-chip" type="button" data-airport="GOT" aria-pressed="false">GOT <small>Landvetter</small></button>
+          <button class="airport-chip" type="button" data-airport="BMA" aria-pressed="false">BMA <small>Bromma</small></button>
+          <button class="airport-chip" type="button" data-airport="MMX" aria-pressed="false">MMX <small>Malmö</small></button>
+          <button class="airport-chip" type="button" data-airport="LLA" aria-pressed="false">LLA <small>Luleå</small></button>
+          <button class="airport-chip" type="button" data-airport="UME" aria-pressed="false">UME <small>Umeå</small></button>
+              <button class="airport-chip" type="button" data-airport="KRN" aria-pressed="false"><strong>KRN</strong><small>Kiruna</small></button>
+      <button class="airport-chip" type="button" data-airport="RNB" aria-pressed="false"><strong>RNB</strong><small>Ronneby</small></button>
+      <button class="airport-chip" type="button" data-airport="VBY" aria-pressed="false"><strong>VBY</strong><small>Visby</small></button>
+      <button class="airport-chip" type="button" data-airport="OSD" aria-pressed="false"><strong>OSD</strong><small>Åre Östersund</small></button>
+</div>
+        <div class="flight-tabs" role="tablist" aria-label="Choose arrivals or departures">
+          <button class="flight-mode-tab" id="arrivals-tab" type="button" role="tab" aria-selected="true" aria-controls="flight-search-panel" data-flight-mode="arrivals">Arrivals</button>
+          <button class="flight-mode-tab" id="departures-tab" type="button" role="tab" aria-selected="false" aria-controls="flight-search-panel" data-flight-mode="departures">Departures</button>
+        </div>
+        <div class="flight-search-panel" id="flight-search-panel" role="tabpanel" aria-labelledby="arrivals-tab">
+          <form class="arrival-search" id="arrival-search" aria-label="Search flights">
+            <label for="flight-date">Date (UTC)</label>
+            <input id="flight-date" name="date" type="date" required>
+            <button class="search-button" type="submit">Show arrivals</button>
+          </form>
+          <section class="arrival-results" id="arrival-results" aria-live="polite" hidden>
+            <h3 id="results-title">Arrival results</h3>
+            <p id="arrival-message"></p>
+            <div class="arrival-list" id="arrival-list"></div>
+            <nav class="flight-pagination" id="flight-pagination" aria-label="Flight result pages" hidden>
+              <button class="pagination-button" id="previous-page" type="button" disabled>Previous</button>
+              <span class="pagination-info" id="pagination-info"></span>
+              <button class="pagination-button" id="next-page" type="button">Next</button>
+            </nav>
+          </section>
+        </div>
+        <div class="airport-panel-note">
+          <img class="palm-image" src="{{ url_for('static', filename='images/palm-island.png') }}" alt="" aria-hidden="true">
+        </div>
+      </section>
+
+      <section class="features" aria-labelledby="features-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">FLIGHT TOOLS</p>
+            <h2 id="features-title">What would you like to explore?</h2>
+          </div>
+          <span class="section-note">Explore your flight options</span>
+        </div>
+        <div class="feature-grid">
+          <a class="feature-card feature-link" href="#arrival-search" data-flight-mode="arrivals">
+            <span class="feature-icon" aria-hidden="true">↘</span>
+            <h3>Arrivals</h3>
+            <p>View incoming flights by airport and date.</p>
+          </a>
+          <a class="feature-card feature-link" href="#arrival-search" data-flight-mode="departures">
+            <span class="feature-icon" aria-hidden="true">↗</span>
+            <h3>Departures</h3>
+            <p>View departing flights by airport and date.</p>
+          </a>
+          <article class="feature-card">
+            <span class="feature-icon" aria-hidden="true">⌕</span>
+            <h3>Find a flight</h3>
+            <p>Look up a specific flight number.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon" aria-hidden="true">♥</span>
+            <h3>API status</h3>
+            <p>Check the FlightInfo service response.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">Flight information for every part of your journey.</footer>
+    <script src="{{ url_for('static', filename='flight_search.js') }}" defer></script>
+  </body>
+</html>
