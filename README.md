@@ -4,19 +4,37 @@ A browser-based learning project inspired by the Swedavia FlightInfo API v2 refe
 
 ## Run on Windows
 
-The easiest way to start the application is to double-click `start_flightinfo.bat` in the project folder. In VS Code, you can also run it from a PowerShell terminal opened in the project root:
+The Windows launcher is `start_flightinfo.bat`, located inside the `API projekt` folder. In VS Code, first check the folder shown at the end of the PowerShell prompt, then use the matching command below.
+
+### If the terminal is in the parent `Swedavia FlightInfo` folder
+
+For example, if the prompt ends with:
+
+```text
+PS C:\Users\hp\OneDrive\Skrivbord\Swedavia FlightInfo>
+```
+
+Run this exact command:
+
+```powershell
+& ".\API projekt\start_flightinfo.bat"
+```
+
+### If the terminal is already in the `API projekt` folder
+
+For example, if the prompt ends with:
+
+```text
+PS C:\Users\hp\OneDrive\Skrivbord\Swedavia FlightInfo\API projekt>
+```
+
+Run:
 
 ```powershell
 .\start_flightinfo.bat
 ```
 
-The launcher creates the local `.venv` environment if needed, installs the packages from `requirements.txt`, starts the Flask server in a separate command window, and opens the app in Microsoft Edge at `http://127.0.0.1:5000/`. Keep the server window open while using the app. Stop the server with `Ctrl+C` in that window.
-
-On the learner's original desktop layout, the project folder is nested inside `Swedavia FlightInfo\API projekt`. If a PowerShell terminal is still in the parent `Swedavia FlightInfo` folder, run:
-
-```powershell
-& ".\API projekt\start_flightinfo.bat"
-```
+You can also double-click `start_flightinfo.bat` in File Explorer. The launcher creates the project's local `.venv` environment if needed, installs packages from `requirements.txt`, starts Flask in a separate command window, and opens the app in Microsoft Edge at `http://127.0.0.1:5000/`. Keep the server window open while using the app. Stop the server with `Ctrl+C` in that window.
 
 For manual setup from the project root:
 

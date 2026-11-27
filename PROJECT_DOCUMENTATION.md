@@ -102,13 +102,19 @@ Earlier manual checks confirmed that the Flask page and its CSS, JavaScript, and
 
 ## 7. Run the application
 
-On Windows, open the project folder in VS Code and run this command from the project root, or double-click the launcher in File Explorer:
+On Windows, find the folder shown at the end of the PowerShell prompt and use the matching command. If the prompt ends with `...\Swedavia FlightInfo>`, run:
+
+```powershell
+& ".\API projekt\start_flightinfo.bat"
+```
+
+If the prompt ends with `...\Swedavia FlightInfo\API projekt>`, run:
 
 ```powershell
 .\start_flightinfo.bat
 ```
 
-The app opens at `http://127.0.0.1:5000/`. Keep its server window open while using the page. For live API requests, save the user's own subscription key outside the project as described in `README.md`.
+You can also double-click the launcher from File Explorer. The app opens at `http://127.0.0.1:5000/`. Keep its server window open while using the page. For live API requests, save the user's own subscription key outside the project as described in `README.md`.
 
 ## 8. Conclusion and remaining limits
 
