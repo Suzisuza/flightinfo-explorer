@@ -10,29 +10,40 @@ and departures as readable flight cards.
 How one search works
 --------------------
 1. The user chooses an airport, Arrivals or Departures, and a date.
-2. For departures, the user can type a destination or country and choose a
-   suggestion from the matching list.
+2. The user can type an origin city or country for arrivals, or a destination
+   city or country for departures, then choose a matching suggestion. Leaving
+   the field empty and pressing Show arrivals or Show departures requests all
+   flights available for that airport, date, and direction.
 3. JavaScript sends the choices to a route in the local Flask application.
 4. Flask validates the request and calls flightinfo_api_client.py.
 5. The API client reads the subscription key from a local file outside the
    project and sends an authenticated request to Swedavia.
-6. Swedavia returns JSON. Flask passes it to the browser, and JavaScript
-   creates flight cards, sorts them by scheduled time, and shows 50 per page.
+6. Swedavia returns JSON. For OData departures, the Python client selects the
+   departure leg when a flight record wraps it together with an arrival leg.
+   Flask passes the normalized data to the browser, and JavaScript creates
+   flight cards, sorts them by scheduled time, and shows 50 per page.
 
 Important files
 ---------------
+start_flightinfo.bat
+This Windows launcher prepares the local Python environment, installs the
+required packages, starts Flask on a free local port, and opens the page in
+Microsoft Edge.
+
 flightinfo_app.py
 This is the Flask application. It serves the page and provides routes for
 arrivals, departures, and the API connection check. It adds destination city
 and country labels from the local JSON data and applies the selected city or
-country filter to departures.
+origin city/country filter to arrivals and destination city/country filter to
+departures.
 
 flightinfo_api_client.py
 This module validates airport codes and dates, loads the local subscription
 key, sends HTTP GET requests, builds the OData departure query, and handles
 API errors. The departure query filters by airport, scheduled date, and
-flight type. The connection check makes a small public OData request with a
-result count of one.
+flight type. It selects the departure leg from wrapped OData records before
+the app renders them. The connection check makes a small public OData request
+with a result count of one.
 
 data/city_country.json
 This JSON file stores airport display names and destination suggestions based
@@ -44,9 +55,10 @@ statistics do not guarantee a route operates on a selected travel date.
 
 templates/index.html
 This file defines the page structure: airport choices, Arrivals and Departures
-tabs, date field, destination search, results area, and API connection controls.
-The destination search stays closed when empty and shows only country or city
-names that begin with the entered text.
+tabs, date field, location search, results area, and API connection controls.
+The search label and placeholder change with the selected direction. Suggestions
+stay closed when empty and show only country or city names that begin with the
+entered text.
 
 static/flight_search.js
 This file handles page interactions. It changes the selected flight

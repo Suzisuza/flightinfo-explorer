@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="A simple flight information explorer for arrivals, departures and flight details.">
     <title>FlightInfo Explorer</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/flightinfo-icon.svg') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='flightinfo_design.css') }}">
   </head>
   <body>
@@ -58,10 +59,10 @@
             <input id="flight-date" name="date" type="date" required>
             <button class="search-button" type="submit">Show arrivals</button>
           </form>
-          <div class="country-filter" id="country-filter" hidden>
-            <label for="destination-country">Search destination or country</label>
+          <div class="country-filter" id="country-filter">
+            <label for="destination-country">Search origin city or country</label>
             <div class="destination-search-wrap">
-              <input id="destination-country" name="destination" type="search" placeholder="Type a destination or country" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="destination-options">
+              <input id="destination-country" name="destination" type="search" placeholder="Type an origin city or country" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="destination-options">
               <ul class="destination-suggestions" id="destination-options" role="listbox" hidden></ul>
             </div>
             <script type="application/json" id="destination-options-data">{{ destination_search_options|tojson }}</script>

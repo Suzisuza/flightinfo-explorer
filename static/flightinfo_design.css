@@ -272,6 +272,10 @@ h2 {
   margin-top: 14px;
 }
 
+.country-filter[hidden] {
+  display: none;
+}
+
 .country-filter label {
   font-size: 13px;
   font-weight: bold;

@@ -1,7 +1,7 @@
 # Project Summary
 
-FlightInfo Explorer is a browser-based reverse-engineering project built with Python, Flask, HTML, CSS, and JavaScript. It uses the Swedavia FlightInfo API v2 to retrieve arrivals and departures and present them as readable flight cards.
+FlightInfo Explorer is a browser-based reverse-engineering project built with Python, Flask, HTML, CSS, and JavaScript. It uses the Swedavia FlightInfo API v2 to display arrivals and departures as readable flight cards.
 
-Users can select one of ten Swedavia airports, choose a date and flight direction, browse 50 results per page, and type a destination or country to filter departures. Suggestions remain hidden until the user types and match from the beginning of the name. The local JSON suggestion list contains 254 city-country pairs in 51 countries, based on Swedavia's 2025 destination statistics. It includes every European destination listed in that source and selected destinations from Africa, Asia, North America, and South America. The source does not list a destination in Oceania with passenger traffic during 2025.
+Users choose an airport, date, and flight direction. They can view all returned flights or filter arrivals by origin and departures by destination. Results are ordered by scheduled time and shown 50 per page. A local JSON file supplies airport labels and city/country suggestions based on Swedavia's 2025 destination statistics.
 
-Departures use the documented OData query operation. The app also provides an API connection check. A local subscription key is required for live API searches and is stored outside the project folder.
+Arrivals use the documented FlightInfo operation. Departures use the documented OData query. A local subscription key, stored outside the project folder, is required for live API searches.

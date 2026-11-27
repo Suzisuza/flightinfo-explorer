@@ -37,6 +37,7 @@ def _key_file_candidates() -> list[Path]:
         secret_folder = Path.home() / "AppData" / "Local" / "FlightInfoSecrets"
 
     return [
+        secret_folder / "swedavia_api_key_primary.txt",
         secret_folder / "swedavia_primary_key.txt",
         secret_folder / "swedavia_secondary_key.txt",
         secret_folder / "swedavia_api_key.txt",
@@ -143,7 +144,12 @@ def _fetch_flights(direction: str, airport: str, flight_date: str) -> dict:
 
 
 def _normalize_query_response(data: dict | list) -> dict:
-    """Return OData flight records in the same shape used by the web page."""
+    """Return OData departure records in the shape used by the web page.
+
+    The query response can wrap each flight in separate ``arrival`` and
+    ``departure`` objects. The departure board needs the departure object,
+    which contains the route, time, airline, and status fields.
+    """
     if isinstance(data, list):
         flights = data
         response = {}
@@ -156,8 +162,23 @@ def _normalize_query_response(data: dict | list) -> dict:
             "The OData query returned an unexpected flight list."
         )
 
-    response["flights"] = flights
-    response["numberOfFlights"] = len(flights)
+    normalized_flights = []
+    for flight in flights:
+        if not isinstance(flight, dict):
+            normalized_flights.append(flight)
+            continue
+
+        # FlightInfo's OData response may wrap each journey leg in an object.
+        # For this departure query, select the departure leg for the board.
+        departure = flight.get("departure", flight.get("Departure"))
+        if isinstance(departure, dict):
+            normalized_flights.append({**flight, **departure})
+        else:
+            # Keep the flat form supported for existing API responses/tests.
+            normalized_flights.append(flight)
+
+    response["flights"] = normalized_flights
+    response["numberOfFlights"] = len(normalized_flights)
     return response
 
 

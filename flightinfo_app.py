@@ -95,6 +95,51 @@ def _destination_iata(flight: dict) -> str:
     return str(code or "").upper()
 
 
+def _origin_iata(flight: dict) -> str:
+    """Read the origin IATA code from supported FlightInfo response shapes."""
+    code = flight.get("departureAirportIata") or flight.get("DepartureAirportIata")
+    if code:
+        return str(code).upper()
+
+    identifier = flight.get("flightLegIdentifier") or flight.get("FlightLegIdentifier") or {}
+    code = identifier.get("departureAirportIata") or identifier.get("DepartureAirportIata")
+    return str(code or "").upper()
+
+
+def _add_origin_details(data: dict) -> dict:
+    """Attach origin city and country labels from the local airport lookup."""
+    flights = data.get("flights", data.get("Flights", []))
+    if not isinstance(flights, list):
+        return data
+
+    for flight in flights:
+        if not isinstance(flight, dict):
+            continue
+        code = _origin_iata(flight)
+        origin = DESTINATION_AIRPORTS.get(code)
+        if origin:
+            origin = _find_destination_by_city(
+                origin.get("city", ""), origin.get("country", "")
+            ) or origin
+        else:
+            api_city = (
+                flight.get("departureAirportEnglish")
+                or flight.get("DepartureAirportEnglish")
+                or flight.get("departureAirportSwedish")
+                or flight.get("DepartureAirportSwedish")
+                or ""
+            )
+            origin = _find_destination_by_city(str(api_city))
+        if origin:
+            if code:
+                flight["originAirportIata"] = code
+            flight["originCity"] = origin["city"]
+            flight["originCountry"] = origin["country"]
+        else:
+            flight["originCountry"] = ""
+    return data
+
+
 def _add_destination_details(data: dict) -> dict:
     """Attach city and country details using airport code or API city text."""
     flights = data.get("flights", data.get("Flights", []))
@@ -129,23 +174,30 @@ def _add_destination_details(data: dict) -> dict:
     return data
 
 
-def _filter_departures_by_destination(data: dict, search_text: str) -> tuple[dict, str | None]:
-    """Apply an exact country or city-country choice from the destination list."""
+def _filter_flights_by_location(
+    data: dict,
+    search_text: str,
+    *,
+    city_field: str,
+    country_field: str,
+    filter_prefix: str,
+) -> tuple[dict, str]:
+    """Filter flight records by an exact country or city-country suggestion."""
     normalized = search_text.casefold()
     country_by_name = {name.casefold(): name for name in DESTINATION_COUNTRIES}
+    flights = data.get("flights", data.get("Flights", []))
 
     if normalized in country_by_name:
         selected_country = country_by_name[normalized]
-        flights = data.get("flights", data.get("Flights", []))
         data["flights"] = [
             flight
             for flight in flights
             if isinstance(flight, dict)
-            and flight.get("destinationCountry", "").casefold() == normalized
+            and flight.get(country_field, "").casefold() == normalized
         ]
         data["numberOfFlights"] = len(data["flights"])
-        data["destinationCountryFilter"] = selected_country
-        data["destinationFilter"] = selected_country
+        data[f"{filter_prefix}CountryFilter"] = selected_country
+        data[f"{filter_prefix}Filter"] = selected_country
         return data, selected_country
 
     city_by_label = {
@@ -154,22 +206,44 @@ def _filter_departures_by_destination(data: dict, search_text: str) -> tuple[dic
         if entry.get("city") and entry.get("country")
     }
     if normalized not in city_by_label:
-        raise ValueError("Type a destination or country and choose one of the suggestions.")
+        raise ValueError("Choose a city or country from the suggestions.")
 
     selected_city, selected_country = city_by_label[normalized]
-    flights = data.get("flights", data.get("Flights", []))
     data["flights"] = [
         flight
         for flight in flights
         if isinstance(flight, dict)
-        and _normalize_destination(flight.get("destinationCity", ""))
+        and _normalize_destination(flight.get(city_field, ""))
         == _normalize_destination(selected_city)
-        and _normalize_destination(flight.get("destinationCountry", ""))
+        and _normalize_destination(flight.get(country_field, ""))
         == _normalize_destination(selected_country)
     ]
     data["numberOfFlights"] = len(data["flights"])
-    data["destinationFilter"] = f"{selected_city}, {selected_country}"
-    return data, data["destinationFilter"]
+    filter_label = f"{selected_city}, {selected_country}"
+    data[f"{filter_prefix}Filter"] = filter_label
+    return data, filter_label
+
+
+def _filter_departures_by_destination(data: dict, search_text: str) -> tuple[dict, str]:
+    """Apply a destination country or city filter to departures."""
+    return _filter_flights_by_location(
+        data,
+        search_text,
+        city_field="destinationCity",
+        country_field="destinationCountry",
+        filter_prefix="destination",
+    )
+
+
+def _filter_arrivals_by_origin(data: dict, search_text: str) -> tuple[dict, str]:
+    """Apply an origin country or city filter to arrivals."""
+    return _filter_flights_by_location(
+        data,
+        search_text,
+        city_field="originCity",
+        country_field="originCountry",
+        filter_prefix="origin",
+    )
 
 
 @app.get("/")
@@ -182,15 +256,28 @@ def home():
 
 @app.get("/api/arrivals")
 def arrivals():
-    """Return arrivals for a selected airport and UTC date."""
+    """Return arrivals, optionally filtered by their origin city or country."""
     airport = request.args.get("airport", "")
     flight_date = request.args.get("date", "")
+    origin_search = (
+        request.args.get("destination", "") or request.args.get("country", "")
+    ).strip()
 
     if not airport or not flight_date:
         return jsonify(error="Choose an airport and date."), 400
 
+    if origin_search and origin_search.casefold() not in {
+        option.casefold() for option in DESTINATION_SEARCH_OPTIONS
+    }:
+        return jsonify(
+            error="Choose a city or country from the suggestions."
+        ), 400
+
     try:
         data = fetch_arrivals(airport, flight_date)
+        if origin_search:
+            data = _add_origin_details(data)
+            data, _ = _filter_arrivals_by_origin(data, origin_search)
     except ValueError as error:
         return jsonify(error=str(error)), 400
     except FlightInfoConfigurationError as error:
@@ -217,7 +304,7 @@ def departures():
         option.casefold() for option in DESTINATION_SEARCH_OPTIONS
     }:
         return jsonify(
-            error="Type a destination or country and choose one of the suggestions."
+            error="Choose a city or country from the suggestions."
         ), 400
 
     try:

@@ -1,84 +1,76 @@
 # FlightInfo Explorer
 
-A browser-based learning project inspired by the Swedavia FlightInfo API v2 reference application.
+FlightInfo Explorer is a browser-based reverse-engineering project built with Python, Flask, HTML, CSS, and JavaScript. It uses the Swedavia FlightInfo API v2 to display arrivals and departures as readable flight cards.
 
 ## Run on Windows
 
-The Windows launcher is `start_flightinfo.bat`, located inside the `API projekt` folder. In VS Code, first check the folder shown at the end of the PowerShell prompt, then use the matching command below.
+The recommended way to start the application is `start_flightinfo.bat` in the `API projekt` folder. In VS Code, look at the folder at the end of the PowerShell prompt.
 
-### If the terminal is in the parent `Swedavia FlightInfo` folder
-
-For example, if the prompt ends with:
-
-```text
-PS C:\Users\hp\OneDrive\Skrivbord\Swedavia FlightInfo>
-```
-
-Run this exact command:
+If the terminal is in the parent `Swedavia FlightInfo` folder, run:
 
 ```powershell
 & ".\API projekt\start_flightinfo.bat"
 ```
 
-### If the terminal is already in the `API projekt` folder
-
-For example, if the prompt ends with:
-
-```text
-PS C:\Users\hp\OneDrive\Skrivbord\Swedavia FlightInfo\API projekt>
-```
-
-Run:
+If the terminal is already in the `API projekt` folder, run:
 
 ```powershell
 .\start_flightinfo.bat
 ```
 
-You can also double-click `start_flightinfo.bat` in File Explorer. The launcher creates the project's local `.venv` environment if needed, installs packages from `requirements.txt`, starts Flask in a separate command window, and opens the app in Microsoft Edge at `http://127.0.0.1:5000/`. Keep the server window open while using the app. Stop the server with `Ctrl+C` in that window.
+The launcher creates `.venv` if needed, installs the packages in `requirements.txt`, chooses an available local port starting at 5000, starts Flask in a separate window, and opens the application in Microsoft Edge. Keep the server window open. Stop it with `Ctrl+C` in that window.
 
-For manual setup from the project root:
+### Manual setup
 
-1. Create a virtual environment: `py -m venv .venv`
-2. Install dependencies: `.venv\Scripts\python.exe -m pip install -r requirements.txt`
-3. Start Flask: `.venv\Scripts\python.exe -m flask --app flightinfo_app run`
-4. Open `http://127.0.0.1:5000/` in a browser.
+Run these commands from the `API projekt` folder:
 
-The first run of the launcher needs an internet connection to install Flask. If Python is not installed, install Python 3 first. If port 5000 is already in use, stop the other Flask server before starting this one.
+```powershell
+py -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+.venv\Scripts\python.exe -m flask --app flightinfo_app run --port 5055
+```
 
-## Project files
+Then open `http://127.0.0.1:5055/` in a browser. If that port is occupied, choose another unused port and use the same port in the address.
+
+## Features
+
+- Select one of ten airports, a date, and Arrivals or Departures.
+- Leave the location field empty to view all flights returned for the selection.
+- Filter arrivals by origin city or country and departures by destination city or country.
+- Browse scheduled-time results in pages of up to 50 flights.
+- Check the live FlightInfo API connection.
+
+Arrivals use the documented FlightInfo v2 arrivals operation. Departures use the documented OData query operation. The API client normalizes wrapped departure records before the page displays them. The search suggestions come from Swedavia's [2025 destination statistics](https://www.swedavia.se/contentassets/95dc75e405f0460fb852949b4b7cb09f/destinations-statistik-2025.xlsx).
+
+## API key
+
+Save your subscription key outside the project folder, preferably at:
+
+`%LOCALAPPDATA%\FlightInfoSecrets\swedavia_api_key_primary.txt`
+
+The application also recognizes `swedavia_primary_key.txt`, `swedavia_secondary_key.txt`, and `swedavia_api_key.txt` in that folder. Do not add a key to the project, GitHub, or the submission ZIP. A teacher who wants live results must use their own key.
+
+## Important files
 
 | File | Purpose |
 |---|---|
-| `start_flightinfo.bat` | Windows launcher: prepares dependencies, starts Flask, and opens the browser |
-| `flightinfo_app.py` | Main Flask application and browser routes |
-| `flightinfo_api_client.py` | Sends authenticated FlightInfo requests from Python |
-| `data/city_country.json` | Local airport labels and destination suggestions used for city and country filtering |
-| `templates/index.html` | Structure and text of the browser page |
-| `static/flight_search.js` | Airport and tab selection, search, destination filter, readable flight list, and API connection check |
-| `static/flightinfo_design.css` | Colors, layout, hover effects, and responsive design |
-| `tests/test_flightinfo_app.py` | Automated checks for the app and API client |
-| `requirements.txt` | Python packages needed by the project |
+| `start_flightinfo.bat` | Prepares and launches the application on Windows |
+| `flightinfo_app.py` | Flask routes, input checks, data mapping, and filters |
+| `flightinfo_api_client.py` | API requests, OData query, key loading, and error handling |
+| `data/city_country.json` | Airport labels and city/country suggestions |
+| `templates/index.html` | Browser page structure |
+| `static/flight_search.js` | Search, flight cards, sorting, paging, and connection status |
+| `static/flightinfo_design.css` | Page layout and visual styling |
+| `PROJECT_DOCUMENTATION.md` | Written record of the research, design choices, and implementation |
+| `PROJECT_SUMMARY.md` | Short project overview |
+| `CODE_EXPLANATION.txt` | Plain-language explanation of important code |
 
-Arrivals use the documented FlightInfo v2 arrivals operation. Departures use the documented OData query operation, filtering by airport, scheduled date, and departure type. The browser sends the selected airport, date, and optional destination country to Flask; Python adds the subscription key and contacts the Swedavia API.
+## Run the tests
 
-For departures, type a destination city or country name and choose a matching suggestion. Suggestions appear only after typing and match from the beginning of the name. The list in `data/city_country.json` is based on Swedavia's official [2025 destination statistics](https://www.swedavia.se/contentassets/95dc75e405f0460fb852949b4b7cb09f/destinations-statistik-2025.xlsx). It contains 254 city-country pairs in 51 countries: all European destinations listed in that source, plus selected countries in Africa, Asia, North America, and South America. The source lists no Oceania destination with passenger traffic during 2025. These are historical traffic statistics and do not guarantee that a route operates on every selected travel date. When an IATA code is not in the local lookup, the app can match a unique city name returned by FlightInfo.
-
-The **Check connection** control makes one small authenticated public OData request and reports whether the API responds. It is a live connectivity check and therefore requires a valid key and internet access. It does not call the portal's separate `heartBeat` operation, which is documented as internal use only.
-
-## Local API key
-
-Save one key in a text file outside this project, preferably at:
-
-`%LOCALAPPDATA%\FlightInfoSecrets\swedavia_primary_key.txt`
-
-The app also recognizes `swedavia_secondary_key.txt` and `swedavia_api_key.txt` in that same folder. It reads only the first available file in that order. Never paste a key into source code, the browser JavaScript, GitHub, or a project ZIP.
-
-The homepage can run without a key. Live arrival and departure searches require a valid local key file; a teacher receiving the project should use their own key if they need to make live API requests. The project ZIP and Git repository must not contain the learner's private key.
-
-Choose **Arrivals** or **Departures** with the tabs above the airport/date search. Both searches support the ten Swedavia airport choices shown in the page: ARN, GOT, BMA, MMX, LLA, UME, KRN, RNB, VBY and OSD. Dates are sent in `YYYY-MM-DD` format. Departures can optionally be filtered by destination city or country using the local JSON lookup. Results are shown as a readable list ordered by scheduled time, with up to 50 flights on each page. The page displays the API's status text as returned and omits optional details that are missing.
-
-Run the automated checks with:
+From the `API projekt` folder, run:
 
 ```powershell
 .venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
+
+The tests cover both flight modes, all ten supported airport choices, all 51 countries in the filter list, OData handling, the API connection route, and pagination. Automated tests use sample responses; live results depend on the API, date, and subscription.

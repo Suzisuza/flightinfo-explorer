@@ -8,15 +8,19 @@ from unittest.mock import MagicMock, patch
 
 from flightinfo_app import (
     DESTINATIONS,
+    DESTINATION_COUNTRIES,
     DESTINATION_SEARCH_OPTIONS,
+    _find_destination_by_city,
     FlightInfoServiceError,
     app,
 )
 from flightinfo_api_client import (
+    SUPPORTED_AIRPORTS,
     check_api_connection,
     fetch_arrivals,
     fetch_departures,
     fetch_departures_query,
+    load_subscription_key,
 )
 
 
@@ -61,12 +65,14 @@ class HomePageTests(unittest.TestCase):
                 with self.subTest(label=label):
                     self.assertIn(label, page)
             self.assertNotIn("OData query", page)
-            self.assertIn("Search destination or country", page)
+            self.assertIn("Search origin city or country", page)
             self.assertIn('id="destination-country"', page)
+            self.assertNotIn("All countries", page)
             self.assertIn('type="search"', page)
             self.assertIn('aria-controls="destination-options"', page)
             self.assertIn('<ul class="destination-suggestions" id="destination-options" role="listbox" hidden></ul>', page)
             self.assertIn('id="destination-options-data"', page)
+            self.assertIn("flightinfo-icon.svg", page)
             self.assertNotIn("<datalist", page)
             self.assertNotIn("(tom), Greece", page)
             self.assertIn('"Amsterdam, Netherlands"', page)
@@ -95,6 +101,106 @@ class HomePageTests(unittest.TestCase):
         finally:
             response.close()
 
+    @patch("flightinfo_app.fetch_arrivals")
+    @patch("flightinfo_app.fetch_departures_query")
+    def test_all_supported_airports_are_accepted_for_both_flight_modes(
+        self, departures_mock, arrivals_mock
+    ):
+        departures_mock.return_value = {"flights": []}
+        arrivals_mock.return_value = {"flights": []}
+
+        for airport in sorted(SUPPORTED_AIRPORTS):
+            with self.subTest(airport=airport):
+                arrival_response = self.client.get(
+                    "/api/arrivals",
+                    query_string={"airport": airport, "date": "2026-11-27"},
+                )
+                departure_response = self.client.get(
+                    "/api/departures",
+                    query_string={"airport": airport, "date": "2026-11-27"},
+                )
+                try:
+                    self.assertEqual(arrival_response.status_code, 200)
+                    self.assertEqual(departure_response.status_code, 200)
+                finally:
+                    arrival_response.close()
+                    departure_response.close()
+
+        self.assertEqual(arrivals_mock.call_count, len(SUPPORTED_AIRPORTS))
+        self.assertEqual(departures_mock.call_count, len(SUPPORTED_AIRPORTS))
+
+    def test_arrivals_country_filter_for_every_country_has_no_cross_country_flights(self):
+        representative_destinations = []
+        for country in DESTINATION_COUNTRIES:
+            representative = next(
+                destination
+                for destination in DESTINATIONS
+                if destination["country"] == country
+                and _find_destination_by_city(destination["city"]) is not None
+            )
+            representative_destinations.append(representative)
+
+        for selected_country in DESTINATION_COUNTRIES:
+            fixtures = [
+                {"departureAirportEnglish": destination["city"]}
+                for destination in representative_destinations
+            ]
+            with self.subTest(country=selected_country), patch(
+                "flightinfo_app.fetch_arrivals",
+                side_effect=lambda *_args, flights=fixtures: {"flights": [dict(flight) for flight in flights]},
+            ):
+                response = self.client.get(
+                    "/api/arrivals",
+                    query_string={
+                        "airport": "ARN",
+                        "date": "2026-11-26",
+                        "destination": selected_country,
+                    },
+                )
+                try:
+                    self.assertEqual(response.status_code, 200)
+                    flights = response.get_json()["flights"]
+                    self.assertEqual(len(flights), 1)
+                    self.assertEqual(flights[0]["originCountry"], selected_country)
+                finally:
+                    response.close()
+
+    def test_departures_country_filter_for_every_country_has_no_cross_country_flights(self):
+        representative_destinations = []
+        for country in DESTINATION_COUNTRIES:
+            representative = next(
+                destination
+                for destination in DESTINATIONS
+                if destination["country"] == country
+                and _find_destination_by_city(destination["city"]) is not None
+            )
+            representative_destinations.append(representative)
+
+        for selected_country in DESTINATION_COUNTRIES:
+            fixtures = [
+                {"arrivalAirportEnglish": destination["city"]}
+                for destination in representative_destinations
+            ]
+            with self.subTest(country=selected_country), patch(
+                "flightinfo_app.fetch_departures_query",
+                side_effect=lambda *_args, flights=fixtures: {"flights": [dict(flight) for flight in flights]},
+            ):
+                response = self.client.get(
+                    "/api/departures",
+                    query_string={
+                        "airport": "ARN",
+                        "date": "2026-11-26",
+                        "destination": selected_country,
+                    },
+                )
+                try:
+                    self.assertEqual(response.status_code, 200)
+                    flights = response.get_json()["flights"]
+                    self.assertEqual(len(flights), 1)
+                    self.assertEqual(flights[0]["destinationCountry"], selected_country)
+                finally:
+                    response.close()
+
     def test_arrivals_route_requires_airport_and_date(self):
         response = self.client.get("/api/arrivals")
         try:
@@ -113,6 +219,64 @@ class HomePageTests(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.get_json(), expected)
             fetch_mock.assert_called_once_with("ARN", "2026-11-26")
+        finally:
+            response.close()
+
+    @patch("flightinfo_app.fetch_arrivals")
+    def test_arrivals_route_filters_by_origin_country(self, fetch_mock):
+        fetch_mock.return_value = {
+            "NumberOfFlights": 2,
+            "Flights": [
+                {"flightId": "SK123", "departureAirportIata": "CPH", "departureAirportEnglish": "Copenhagen"},
+                {"flightId": "BA770", "departureAirportIata": "LHR", "departureAirportEnglish": "London"},
+            ],
+        }
+
+        response = self.client.get(
+            "/api/arrivals?airport=ARN&date=2026-11-26&destination=Denmark"
+        )
+        try:
+            self.assertEqual(response.status_code, 200)
+            data = response.get_json()
+            self.assertEqual(data["numberOfFlights"], 1)
+            self.assertEqual(data["originCountryFilter"], "Denmark")
+            self.assertEqual(data["flights"][0]["originCity"], "Copenhagen")
+            self.assertEqual(data["flights"][0]["originCountry"], "Denmark")
+            fetch_mock.assert_called_once_with("ARN", "2026-11-26")
+        finally:
+            response.close()
+
+    @patch("flightinfo_app.fetch_arrivals")
+    def test_arrivals_route_filters_by_origin_city(self, fetch_mock):
+        fetch_mock.return_value = {
+            "Flights": [
+                {"flightId": "SK123", "departureAirportIata": "CPH"},
+                {"flightId": "SK1428", "departureAirportIata": "CPH"},
+                {"flightId": "BA770", "departureAirportIata": "LHR"},
+            ],
+            "NumberOfFlights": 3,
+        }
+
+        response = self.client.get(
+            "/api/arrivals?airport=ARN&date=2026-11-26&destination=Copenhagen%2C%20Denmark"
+        )
+        try:
+            self.assertEqual(response.status_code, 200)
+            data = response.get_json()
+            self.assertEqual(data["numberOfFlights"], 2)
+            self.assertEqual(data["originFilter"], "Copenhagen, Denmark")
+            self.assertEqual([item["flightId"] for item in data["flights"]], ["SK123", "SK1428"])
+        finally:
+            response.close()
+
+    @patch("flightinfo_app.fetch_arrivals")
+    def test_arrivals_route_rejects_origin_not_in_suggestions(self, fetch_mock):
+        response = self.client.get(
+            "/api/arrivals?airport=ARN&date=2026-11-26&destination=Atlantis"
+        )
+        try:
+            self.assertEqual(response.status_code, 400)
+            fetch_mock.assert_not_called()
         finally:
             response.close()
 
@@ -267,6 +431,8 @@ class HomePageTests(unittest.TestCase):
             self.assertIn(".flight-mode-tab[aria-selected=\"true\"]", css)
             self.assertIn(".flight-pagination[hidden]", css)
             self.assertIn(".country-filter input", css)
+            country_filter_hidden_rule = css.split(".country-filter[hidden] {", 1)[1].split("}", 1)[0]
+            self.assertIn("display: none", country_filter_hidden_rule)
             self.assertIn(".pagination-button", css)
             hover_rule = css.split(".airport-chip:hover {", 1)[1].split("}", 1)[0]
             self.assertIn("background-color: gold", hover_rule)
@@ -288,6 +454,7 @@ class HomePageTests(unittest.TestCase):
             "/static/images/header-plane.png",
             "/static/images/travel-suitcase.png",
             "/static/images/palm-island.png",
+            "/static/images/flightinfo-icon.svg",
         )
 
         for path in image_paths:
@@ -307,12 +474,31 @@ class HomePageTests(unittest.TestCase):
             self.assertIn("const flightsPerPage = 50", script)
             self.assertIn("function renderFlightPage()", script)
             self.assertIn("normalizeSuggestion(option).startsWith(searchText)", script)
+            self.assertIn('destinationFilterPanel.hidden = false', script)
+            self.assertIn('mode === "arrivals" ? "origin" : "destination"', script)
             self.assertIn("if (!searchText) return", script)
+            self.assertIn("selectFlightMode(selectedMode);", script)
+            self.assertIn('flightForm.addEventListener("submit"', script)
+            self.assertNotIn("allCountriesButton", script)
         finally:
             response.close()
 
 
 class FlightInfoClientTests(unittest.TestCase):
+    def test_key_loader_prefers_the_saved_primary_key_filename(self):
+        with tempfile.TemporaryDirectory() as temporary_folder:
+            secret_folder = Path(temporary_folder) / "FlightInfoSecrets"
+            secret_folder.mkdir()
+            (secret_folder / "swedavia_api_key_primary.txt").write_text(
+                "primary-test-key", encoding="utf-8"
+            )
+            (secret_folder / "swedavia_secondary_key.txt").write_text(
+                "secondary-test-key", encoding="utf-8"
+            )
+
+            with patch.dict(os.environ, {"LOCALAPPDATA": temporary_folder}):
+                self.assertEqual(load_subscription_key(), "primary-test-key")
+
     def test_fetch_arrivals_uses_saved_primary_key_and_documented_url(self):
         with tempfile.TemporaryDirectory() as temporary_folder:
             secret_folder = Path(temporary_folder) / "FlightInfoSecrets"
@@ -404,6 +590,32 @@ class FlightInfoClientTests(unittest.TestCase):
             self.assertEqual(data["flights"], [{"flightId": "SK123"}])
             self.assertEqual(data["numberOfFlights"], 1)
             self.assertEqual(data["continuationtoken"], "next")
+
+    def test_fetch_departures_query_unwraps_documented_departure_leg(self):
+        nested_departure = {
+            "flightId": "SK1428",
+            "arrivalAirportEnglish": "Copenhagen",
+            "airlineOperator": {"name": "SAS Scandinavian Airlines"},
+            "departureTime": {"scheduledUtc": "2026-11-27T08:15:00Z"},
+            "locationAndStatus": {"terminal": "T5"},
+        }
+        response_payload = {
+            "flights": [{"arrival": {"flightId": "SK1428"}, "departure": nested_departure}],
+            "continuationtoken": None,
+        }
+
+        with patch("flightinfo_api_client._fetch_api_json", return_value=response_payload):
+            data = fetch_departures_query("ARN", "2026-11-27")
+
+        self.assertEqual(data["numberOfFlights"], 1)
+        self.assertEqual(data["flights"][0]["flightId"], "SK1428")
+        self.assertEqual(data["flights"][0]["arrivalAirportEnglish"], "Copenhagen")
+        self.assertEqual(data["flights"][0]["airlineOperator"]["name"], "SAS Scandinavian Airlines")
+        self.assertEqual(
+            data["flights"][0]["departureTime"]["scheduledUtc"],
+            "2026-11-27T08:15:00Z",
+        )
+        self.assertEqual(data["flights"][0]["locationAndStatus"]["terminal"], "T5")
 
     def test_api_connection_check_uses_one_public_odata_result(self):
         with tempfile.TemporaryDirectory() as temporary_folder:

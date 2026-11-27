@@ -16,6 +16,7 @@ const previousPageButton = document.querySelector("#previous-page");
 const nextPageButton = document.querySelector("#next-page");
 const paginationInfo = document.querySelector("#pagination-info");
 const destinationFilterPanel = document.querySelector("#country-filter");
+const destinationFilterLabel = destinationFilterPanel.querySelector("label");
 const destinationSearchInput = document.querySelector("#destination-country");
 const destinationSuggestionList = document.querySelector("#destination-options");
 const destinationOptions = JSON.parse(
@@ -161,7 +162,10 @@ function createStatusBadge(statusText) {
 
 function selectFlightMode(mode) {
   selectedMode = mode;
-  destinationFilterPanel.hidden = mode !== "departures";
+  destinationFilterPanel.hidden = false;
+  const searchLocation = mode === "arrivals" ? "origin" : "destination";
+  destinationFilterLabel.textContent = `Search ${searchLocation} city or country`;
+  destinationSearchInput.placeholder = `Type a ${searchLocation} city or country`;
   const label = mode === "arrivals" ? "Arrivals" : "Departures";
   resultsTitle.textContent = `${label} results`;
   searchButton.textContent = `Show ${label.toLowerCase()}`;
@@ -180,6 +184,9 @@ function selectFlightMode(mode) {
   });
 }
 
+// Initialize the search panel as soon as the page loads so the first search works.
+selectFlightMode(selectedMode);
+
 function renderFlights(data) {
   flightList.replaceChildren();
   const flights = readField(data, "flights", "Flights");
@@ -197,10 +204,10 @@ function renderFlights(data) {
     (first, second) => scheduledTimestamp(first) - scheduledTimestamp(second),
   );
   currentPage = 0;
-  const destinationDescription = selectedMode === "departures" && destinationSearchInput.value
-    ? ` to ${destinationSearchInput.value}`
+  const locationDescription = destinationSearchInput.value.trim()
+    ? ` ${selectedMode === "arrivals" ? "from" : "to"} ${destinationSearchInput.value.trim()}`
     : "";
-  resultMessage.textContent = `${sortedFlights.length} ${action} ${airportPhrase} ${airportNames[selectedAirport] || selectedAirport}${destinationDescription} on ${dateInput.value}. Sorted from earliest to latest by scheduled time. Times are shown in Stockholm local time.`;
+  resultMessage.textContent = `${sortedFlights.length} ${action} ${airportPhrase} ${airportNames[selectedAirport] || selectedAirport}${locationDescription} on ${dateInput.value}. Sorted from earliest to latest by scheduled time. Times are shown in Stockholm local time.`;
   renderFlightPage();
 }
 
@@ -266,15 +273,15 @@ function renderFlightPage() {
       ? ["departureAirportEnglish", "DepartureAirportEnglish", "departureAirportSwedish", "DepartureAirportSwedish", "departureAirportIata", "DepartureAirportIata"]
       : ["arrivalAirportEnglish", "ArrivalAirportEnglish", "arrivalAirportSwedish", "ArrivalAirportSwedish", "arrivalAirportIata", "ArrivalAirportIata"];
     const otherAirport = readField(flight, ...destinationField);
-    const destinationCity = selectedMode === "departures"
-      ? readField(flight, "destinationCity", "DestinationCity")
-      : "";
-    const destinationCountry = selectedMode === "departures"
-      ? readField(flight, "destinationCountry", "DestinationCountry")
-      : "";
+    const locationCity = selectedMode === "arrivals"
+      ? readField(flight, "originCity", "OriginCity")
+      : readField(flight, "destinationCity", "DestinationCity");
+    const locationCountry = selectedMode === "arrivals"
+      ? readField(flight, "originCountry", "OriginCountry")
+      : readField(flight, "destinationCountry", "DestinationCountry");
     const route = document.createElement("p");
     route.className = "flight-route";
-    const destinationText = [destinationCity, destinationCountry].filter(Boolean).join(", ");
+    const destinationText = [locationCity, locationCountry].filter(Boolean).join(", ");
     route.textContent = otherAirport || destinationText
       ? `${selectedMode === "arrivals" ? "From" : "To"} ${destinationText || otherAirport}`
       : "Route information unavailable";
@@ -383,7 +390,7 @@ flightForm.addEventListener("submit", async (event) => {
     airport: selectedAirport,
     date: dateInput.value,
   });
-  if (selectedMode === "departures" && destinationSearchInput.value) {
+  if (destinationSearchInput.value.trim()) {
     parameters.set("destination", destinationSearchInput.value);
   }
 
