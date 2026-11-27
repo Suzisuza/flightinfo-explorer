@@ -1,114 +1,1905 @@
 {
-  "sourceNote": "Curated city and country lookup for common destination airports. It is a local display/filter dataset, not an official or exhaustive Swedavia route list.",
+  "sourceNote": "Destination suggestions are based on Swedavia Destinationsstatistik 2025. This is historical traffic information and does not guarantee a route operates on every selected date.",
   "airports": {
-    "ARN": {"city": "Stockholm", "country": "Sweden"},
-    "BMA": {"city": "Stockholm", "country": "Sweden"},
-    "GOT": {"city": "Gothenburg", "country": "Sweden"},
-    "MMX": {"city": "Malmö", "country": "Sweden"},
-    "LLA": {"city": "Luleå", "country": "Sweden"},
-    "UME": {"city": "Umeå", "country": "Sweden"},
-    "KRN": {"city": "Kiruna", "country": "Sweden"},
-    "RNB": {"city": "Ronneby", "country": "Sweden"},
-    "VBY": {"city": "Visby", "country": "Sweden"},
-    "OSD": {"city": "Åre Östersund", "country": "Sweden"},
-    "OER": {"city": "Örnsköldsvik", "country": "Sweden"},
-    "AJR": {"city": "Arvidsjaur", "country": "Sweden"},
-    "SDL": {"city": "Sundsvall", "country": "Sweden"},
-    "CPH": {"city": "Copenhagen", "country": "Denmark"},
-    "BLL": {"city": "Billund", "country": "Denmark"},
-    "OSL": {"city": "Oslo", "country": "Norway"},
-    "BGO": {"city": "Bergen", "country": "Norway"},
-    "TRD": {"city": "Trondheim", "country": "Norway"},
-    "HEL": {"city": "Helsinki", "country": "Finland"},
-    "OUL": {"city": "Oulu", "country": "Finland"},
-    "LHR": {"city": "London", "country": "United Kingdom"},
-    "LGW": {"city": "London", "country": "United Kingdom"},
-    "STN": {"city": "London", "country": "United Kingdom"},
-    "MAN": {"city": "Manchester", "country": "United Kingdom"},
-    "EDI": {"city": "Edinburgh", "country": "United Kingdom"},
-    "DUB": {"city": "Dublin", "country": "Ireland"},
-    "AMS": {"city": "Amsterdam", "country": "Netherlands"},
-    "BRU": {"city": "Brussels", "country": "Belgium"},
-    "FRA": {"city": "Frankfurt", "country": "Germany"},
-    "MUC": {"city": "Munich", "country": "Germany"},
-    "BER": {"city": "Berlin", "country": "Germany"},
-    "DUS": {"city": "Düsseldorf", "country": "Germany"},
-    "HAM": {"city": "Hamburg", "country": "Germany"},
-    "CDG": {"city": "Paris", "country": "France"},
-    "ORY": {"city": "Paris", "country": "France"},
-    "NCE": {"city": "Nice", "country": "France"},
-    "ZRH": {"city": "Zurich", "country": "Switzerland"},
-    "GVA": {"city": "Geneva", "country": "Switzerland"},
-    "VIE": {"city": "Vienna", "country": "Austria"},
-    "PRG": {"city": "Prague", "country": "Czechia"},
-    "WAW": {"city": "Warsaw", "country": "Poland"},
-    "KRK": {"city": "Kraków", "country": "Poland"},
-    "BUD": {"city": "Budapest", "country": "Hungary"},
-    "OTP": {"city": "Bucharest", "country": "Romania"},
-    "SOF": {"city": "Sofia", "country": "Bulgaria"},
-    "BEG": {"city": "Belgrade", "country": "Serbia"},
-    "ZAG": {"city": "Zagreb", "country": "Croatia"},
-    "SPU": {"city": "Split", "country": "Croatia"},
-    "TLL": {"city": "Tallinn", "country": "Estonia"},
-    "RIX": {"city": "Riga", "country": "Latvia"},
-    "VNO": {"city": "Vilnius", "country": "Lithuania"},
-    "FCO": {"city": "Rome", "country": "Italy"},
-    "MXP": {"city": "Milan", "country": "Italy"},
-    "VCE": {"city": "Venice", "country": "Italy"},
-    "MAD": {"city": "Madrid", "country": "Spain"},
-    "BCN": {"city": "Barcelona", "country": "Spain"},
-    "ALC": {"city": "Alicante", "country": "Spain"},
-    "AGP": {"city": "Málaga", "country": "Spain"},
-    "PMI": {"city": "Palma de Mallorca", "country": "Spain"},
-    "LPA": {"city": "Gran Canaria", "country": "Spain"},
-    "TFS": {"city": "Tenerife", "country": "Spain"},
-    "LIS": {"city": "Lisbon", "country": "Portugal"},
-    "OPO": {"city": "Porto", "country": "Portugal"},
-    "ATH": {"city": "Athens", "country": "Greece"},
-    "HER": {"city": "Heraklion", "country": "Greece"},
-    "RHO": {"city": "Rhodes", "country": "Greece"},
-    "IST": {"city": "Istanbul", "country": "Türkiye"},
-    "SAW": {"city": "Istanbul", "country": "Türkiye"},
-    "AYT": {"city": "Antalya", "country": "Türkiye"},
-    "DLM": {"city": "Dalaman", "country": "Türkiye"},
-    "KEF": {"city": "Reykjavik", "country": "Iceland"},
-    "LCA": {"city": "Larnaca", "country": "Cyprus"},
-    "TUN": {"city": "Tunis", "country": "Tunisia"},
-    "CMN": {"city": "Casablanca", "country": "Morocco"},
-    "RAK": {"city": "Marrakesh", "country": "Morocco"},
-    "HRG": {"city": "Hurghada", "country": "Egypt"},
-    "SSH": {"city": "Sharm El Sheikh", "country": "Egypt"},
-    "DXB": {"city": "Dubai", "country": "United Arab Emirates"},
-    "AUH": {"city": "Abu Dhabi", "country": "United Arab Emirates"},
-    "DOH": {"city": "Doha", "country": "Qatar"},
-    "TLV": {"city": "Tel Aviv", "country": "Israel"},
-    "AMM": {"city": "Amman", "country": "Jordan"},
-    "JFK": {"city": "New York", "country": "United States"},
-    "EWR": {"city": "Newark", "country": "United States"},
-    "ORD": {"city": "Chicago", "country": "United States"},
-    "MIA": {"city": "Miami", "country": "United States"},
-    "LAX": {"city": "Los Angeles", "country": "United States"},
-    "SFO": {"city": "San Francisco", "country": "United States"},
-    "YYZ": {"city": "Toronto", "country": "Canada"},
-    "YUL": {"city": "Montreal", "country": "Canada"},
-    "BKK": {"city": "Bangkok", "country": "Thailand"},
-    "HKT": {"city": "Phuket", "country": "Thailand"},
-    "SIN": {"city": "Singapore", "country": "Singapore"},
-    "KUL": {"city": "Kuala Lumpur", "country": "Malaysia"},
-    "HND": {"city": "Tokyo", "country": "Japan"},
-    "NRT": {"city": "Tokyo", "country": "Japan"},
-    "ICN": {"city": "Seoul", "country": "South Korea"},
-    "PEK": {"city": "Beijing", "country": "China"},
-    "PVG": {"city": "Shanghai", "country": "China"},
-    "DEL": {"city": "New Delhi", "country": "India"},
-    "BOM": {"city": "Mumbai", "country": "India"},
-    "MLE": {"city": "Malé", "country": "Maldives"},
-    "CPT": {"city": "Cape Town", "country": "South Africa"},
-    "JNB": {"city": "Johannesburg", "country": "South Africa"},
-    "GRU": {"city": "São Paulo", "country": "Brazil"},
-    "EZE": {"city": "Buenos Aires", "country": "Argentina"},
-    "CUN": {"city": "Cancún", "country": "Mexico"},
-    "SYD": {"city": "Sydney", "country": "Australia"},
-    "AKL": {"city": "Auckland", "country": "New Zealand"}
-  }
+    "ARN": {
+      "city": "Stockholm",
+      "country": "Sweden"
+    },
+    "BMA": {
+      "city": "Stockholm",
+      "country": "Sweden"
+    },
+    "GOT": {
+      "city": "Gothenburg",
+      "country": "Sweden"
+    },
+    "MMX": {
+      "city": "Malmö",
+      "country": "Sweden"
+    },
+    "LLA": {
+      "city": "Luleå",
+      "country": "Sweden"
+    },
+    "UME": {
+      "city": "Umeå",
+      "country": "Sweden"
+    },
+    "KRN": {
+      "city": "Kiruna",
+      "country": "Sweden"
+    },
+    "RNB": {
+      "city": "Ronneby",
+      "country": "Sweden"
+    },
+    "VBY": {
+      "city": "Visby",
+      "country": "Sweden"
+    },
+    "OSD": {
+      "city": "Åre Östersund",
+      "country": "Sweden"
+    },
+    "OER": {
+      "city": "Örnsköldsvik",
+      "country": "Sweden"
+    },
+    "AJR": {
+      "city": "Arvidsjaur",
+      "country": "Sweden"
+    },
+    "SDL": {
+      "city": "Sundsvall",
+      "country": "Sweden"
+    },
+    "CPH": {
+      "city": "Copenhagen",
+      "country": "Denmark"
+    },
+    "BLL": {
+      "city": "Billund",
+      "country": "Denmark"
+    },
+    "OSL": {
+      "city": "Oslo",
+      "country": "Norway"
+    },
+    "BGO": {
+      "city": "Bergen",
+      "country": "Norway"
+    },
+    "TRD": {
+      "city": "Trondheim",
+      "country": "Norway"
+    },
+    "HEL": {
+      "city": "Helsinki",
+      "country": "Finland"
+    },
+    "OUL": {
+      "city": "Oulu",
+      "country": "Finland"
+    },
+    "LHR": {
+      "city": "London",
+      "country": "United Kingdom"
+    },
+    "LGW": {
+      "city": "London",
+      "country": "United Kingdom"
+    },
+    "STN": {
+      "city": "London",
+      "country": "United Kingdom"
+    },
+    "MAN": {
+      "city": "Manchester",
+      "country": "United Kingdom"
+    },
+    "EDI": {
+      "city": "Edinburgh",
+      "country": "United Kingdom"
+    },
+    "DUB": {
+      "city": "Dublin",
+      "country": "Ireland"
+    },
+    "AMS": {
+      "city": "Amsterdam",
+      "country": "Netherlands"
+    },
+    "BRU": {
+      "city": "Brussels",
+      "country": "Belgium"
+    },
+    "FRA": {
+      "city": "Frankfurt",
+      "country": "Germany"
+    },
+    "MUC": {
+      "city": "Munich",
+      "country": "Germany"
+    },
+    "BER": {
+      "city": "Berlin",
+      "country": "Germany"
+    },
+    "DUS": {
+      "city": "Düsseldorf",
+      "country": "Germany"
+    },
+    "HAM": {
+      "city": "Hamburg",
+      "country": "Germany"
+    },
+    "CDG": {
+      "city": "Paris",
+      "country": "France"
+    },
+    "ORY": {
+      "city": "Paris",
+      "country": "France"
+    },
+    "NCE": {
+      "city": "Nice",
+      "country": "France"
+    },
+    "ZRH": {
+      "city": "Zurich",
+      "country": "Switzerland"
+    },
+    "GVA": {
+      "city": "Geneva",
+      "country": "Switzerland"
+    },
+    "VIE": {
+      "city": "Vienna",
+      "country": "Austria"
+    },
+    "PRG": {
+      "city": "Prague",
+      "country": "Czechia"
+    },
+    "WAW": {
+      "city": "Warsaw",
+      "country": "Poland"
+    },
+    "KRK": {
+      "city": "Kraków",
+      "country": "Poland"
+    },
+    "BUD": {
+      "city": "Budapest",
+      "country": "Hungary"
+    },
+    "OTP": {
+      "city": "Bucharest",
+      "country": "Romania"
+    },
+    "SOF": {
+      "city": "Sofia",
+      "country": "Bulgaria"
+    },
+    "BEG": {
+      "city": "Belgrade",
+      "country": "Serbia"
+    },
+    "ZAG": {
+      "city": "Zagreb",
+      "country": "Croatia"
+    },
+    "SPU": {
+      "city": "Split",
+      "country": "Croatia"
+    },
+    "TLL": {
+      "city": "Tallinn",
+      "country": "Estonia"
+    },
+    "RIX": {
+      "city": "Riga",
+      "country": "Latvia"
+    },
+    "VNO": {
+      "city": "Vilnius",
+      "country": "Lithuania"
+    },
+    "FCO": {
+      "city": "Rome",
+      "country": "Italy"
+    },
+    "MXP": {
+      "city": "Milan",
+      "country": "Italy"
+    },
+    "VCE": {
+      "city": "Venice",
+      "country": "Italy"
+    },
+    "MAD": {
+      "city": "Madrid",
+      "country": "Spain"
+    },
+    "BCN": {
+      "city": "Barcelona",
+      "country": "Spain"
+    },
+    "ALC": {
+      "city": "Alicante",
+      "country": "Spain"
+    },
+    "AGP": {
+      "city": "Málaga",
+      "country": "Spain"
+    },
+    "PMI": {
+      "city": "Palma de Mallorca",
+      "country": "Spain"
+    },
+    "LPA": {
+      "city": "Gran Canaria",
+      "country": "Spain"
+    },
+    "TFS": {
+      "city": "Tenerife",
+      "country": "Spain"
+    },
+    "LIS": {
+      "city": "Lisbon",
+      "country": "Portugal"
+    },
+    "OPO": {
+      "city": "Porto",
+      "country": "Portugal"
+    },
+    "ATH": {
+      "city": "Athens",
+      "country": "Greece"
+    },
+    "HER": {
+      "city": "Heraklion",
+      "country": "Greece"
+    },
+    "RHO": {
+      "city": "Rhodes",
+      "country": "Greece"
+    },
+    "IST": {
+      "city": "Istanbul",
+      "country": "Türkiye"
+    },
+    "SAW": {
+      "city": "Istanbul",
+      "country": "Türkiye"
+    },
+    "AYT": {
+      "city": "Antalya",
+      "country": "Türkiye"
+    },
+    "DLM": {
+      "city": "Dalaman",
+      "country": "Türkiye"
+    },
+    "KEF": {
+      "city": "Reykjavik",
+      "country": "Iceland"
+    },
+    "LCA": {
+      "city": "Larnaca",
+      "country": "Cyprus"
+    },
+    "TUN": {
+      "city": "Tunis",
+      "country": "Tunisia"
+    },
+    "CMN": {
+      "city": "Casablanca",
+      "country": "Morocco"
+    },
+    "RAK": {
+      "city": "Marrakesh",
+      "country": "Morocco"
+    },
+    "HRG": {
+      "city": "Hurghada",
+      "country": "Egypt"
+    },
+    "SSH": {
+      "city": "Sharm El Sheikh",
+      "country": "Egypt"
+    },
+    "DXB": {
+      "city": "Dubai",
+      "country": "United Arab Emirates"
+    },
+    "AUH": {
+      "city": "Abu Dhabi",
+      "country": "United Arab Emirates"
+    },
+    "DOH": {
+      "city": "Doha",
+      "country": "Qatar"
+    },
+    "TLV": {
+      "city": "Tel Aviv",
+      "country": "Israel"
+    },
+    "AMM": {
+      "city": "Amman",
+      "country": "Jordan"
+    },
+    "JFK": {
+      "city": "New York",
+      "country": "United States"
+    },
+    "EWR": {
+      "city": "Newark",
+      "country": "United States"
+    },
+    "ORD": {
+      "city": "Chicago",
+      "country": "United States"
+    },
+    "MIA": {
+      "city": "Miami",
+      "country": "United States"
+    },
+    "LAX": {
+      "city": "Los Angeles",
+      "country": "United States"
+    },
+    "SFO": {
+      "city": "San Francisco",
+      "country": "United States"
+    },
+    "YYZ": {
+      "city": "Toronto",
+      "country": "Canada"
+    },
+    "YUL": {
+      "city": "Montreal",
+      "country": "Canada"
+    },
+    "BKK": {
+      "city": "Bangkok",
+      "country": "Thailand"
+    },
+    "HKT": {
+      "city": "Phuket",
+      "country": "Thailand"
+    },
+    "SIN": {
+      "city": "Singapore",
+      "country": "Singapore"
+    },
+    "KUL": {
+      "city": "Kuala Lumpur",
+      "country": "Malaysia"
+    },
+    "HND": {
+      "city": "Tokyo",
+      "country": "Japan"
+    },
+    "NRT": {
+      "city": "Tokyo",
+      "country": "Japan"
+    },
+    "ICN": {
+      "city": "Seoul",
+      "country": "South Korea"
+    },
+    "PEK": {
+      "city": "Beijing",
+      "country": "China"
+    },
+    "PVG": {
+      "city": "Shanghai",
+      "country": "China"
+    },
+    "DEL": {
+      "city": "New Delhi",
+      "country": "India"
+    },
+    "BOM": {
+      "city": "Mumbai",
+      "country": "India"
+    },
+    "MLE": {
+      "city": "Malé",
+      "country": "Maldives"
+    },
+    "CPT": {
+      "city": "Cape Town",
+      "country": "South Africa"
+    },
+    "JNB": {
+      "city": "Johannesburg",
+      "country": "South Africa"
+    },
+    "GRU": {
+      "city": "São Paulo",
+      "country": "Brazil"
+    },
+    "EZE": {
+      "city": "Buenos Aires",
+      "country": "Argentina"
+    },
+    "CUN": {
+      "city": "Cancún",
+      "country": "Mexico"
+    },
+    "SYD": {
+      "city": "Sydney",
+      "country": "Australia"
+    },
+    "AKL": {
+      "city": "Auckland",
+      "country": "New Zealand"
+    }
+  },
+  "destinationSource": "https://www.swedavia.se/contentassets/95dc75e405f0460fb852949b4b7cb09f/destinations-statistik-2025.xlsx",
+  "selectionNote": "Includes every listed European destination in the source, plus destinations in selected countries from Africa, Asia, North America, and South America. The source lists no Oceania destination with passenger traffic in 2025.",
+  "destinations": [
+    {
+      "city": "Boa Vista",
+      "country": "Cape Verde",
+      "continent": "Africa"
+    },
+    {
+      "city": "Sal Island",
+      "country": "Cape Verde",
+      "continent": "Africa"
+    },
+    {
+      "city": "Cairo",
+      "country": "Egypt",
+      "continent": "Africa"
+    },
+    {
+      "city": "Hurghada",
+      "country": "Egypt",
+      "continent": "Africa",
+      "airportCodes": [
+        "HRG"
+      ]
+    },
+    {
+      "city": "Sharm El-sheikh",
+      "country": "Egypt",
+      "continent": "Africa"
+    },
+    {
+      "city": "Addis Ababa",
+      "country": "Ethiopia",
+      "continent": "Africa"
+    },
+    {
+      "city": "Agadir",
+      "country": "Morocco",
+      "continent": "Africa"
+    },
+    {
+      "city": "Marrakech",
+      "country": "Morocco",
+      "continent": "Africa"
+    },
+    {
+      "city": "Beijing",
+      "country": "China",
+      "continent": "Asia",
+      "airportCodes": [
+        "PEK"
+      ]
+    },
+    {
+      "city": "Shanghai",
+      "country": "China",
+      "continent": "Asia",
+      "airportCodes": [
+        "PVG"
+      ]
+    },
+    {
+      "city": "Tokyo",
+      "country": "Japan",
+      "continent": "Asia",
+      "airportCodes": [
+        "HND",
+        "NRT"
+      ]
+    },
+    {
+      "city": "Amman",
+      "country": "Jordan",
+      "continent": "Asia",
+      "airportCodes": [
+        "AMM"
+      ]
+    },
+    {
+      "city": "Doha",
+      "country": "Qatar",
+      "continent": "Asia",
+      "airportCodes": [
+        "DOH"
+      ]
+    },
+    {
+      "city": "Bangkok",
+      "country": "Thailand",
+      "continent": "Asia",
+      "airportCodes": [
+        "BKK"
+      ]
+    },
+    {
+      "city": "Krabi",
+      "country": "Thailand",
+      "continent": "Asia"
+    },
+    {
+      "city": "Phuket",
+      "country": "Thailand",
+      "continent": "Asia",
+      "airportCodes": [
+        "HKT"
+      ]
+    },
+    {
+      "city": "Dubai",
+      "country": "United Arab Emirates",
+      "continent": "Asia",
+      "airportCodes": [
+        "DXB"
+      ]
+    },
+    {
+      "city": "Sharjah",
+      "country": "United Arab Emirates",
+      "continent": "Asia"
+    },
+    {
+      "city": "Innsbruck",
+      "country": "Austria",
+      "continent": "Europe"
+    },
+    {
+      "city": "Linz",
+      "country": "Austria",
+      "continent": "Europe"
+    },
+    {
+      "city": "Salzburg",
+      "country": "Austria",
+      "continent": "Europe"
+    },
+    {
+      "city": "Vienna",
+      "country": "Austria",
+      "continent": "Europe",
+      "airportCodes": [
+        "VIE"
+      ]
+    },
+    {
+      "city": "Antwerpen",
+      "country": "Belgium",
+      "continent": "Europe"
+    },
+    {
+      "city": "Brussels",
+      "country": "Belgium",
+      "continent": "Europe",
+      "airportCodes": [
+        "BRU"
+      ]
+    },
+    {
+      "city": "Liege",
+      "country": "Belgium",
+      "continent": "Europe"
+    },
+    {
+      "city": "Oostende Brugge",
+      "country": "Belgium",
+      "continent": "Europe"
+    },
+    {
+      "city": "Banja Luka",
+      "country": "Bosnia and Herzegovina",
+      "continent": "Europe"
+    },
+    {
+      "city": "Mostar",
+      "country": "Bosnia and Herzegovina",
+      "continent": "Europe"
+    },
+    {
+      "city": "Sarajevo",
+      "country": "Bosnia and Herzegovina",
+      "continent": "Europe"
+    },
+    {
+      "city": "Tuzla",
+      "country": "Bosnia and Herzegovina",
+      "continent": "Europe"
+    },
+    {
+      "city": "Burgas",
+      "country": "Bulgaria",
+      "continent": "Europe"
+    },
+    {
+      "city": "Sofia",
+      "country": "Bulgaria",
+      "continent": "Europe",
+      "airportCodes": [
+        "SOF"
+      ]
+    },
+    {
+      "city": "Varna",
+      "country": "Bulgaria",
+      "continent": "Europe"
+    },
+    {
+      "city": "Dubrovnik",
+      "country": "Croatia",
+      "continent": "Europe"
+    },
+    {
+      "city": "Pula",
+      "country": "Croatia",
+      "continent": "Europe"
+    },
+    {
+      "city": "Rijeka",
+      "country": "Croatia",
+      "continent": "Europe"
+    },
+    {
+      "city": "Split",
+      "country": "Croatia",
+      "continent": "Europe",
+      "airportCodes": [
+        "SPU"
+      ]
+    },
+    {
+      "city": "Zadar",
+      "country": "Croatia",
+      "continent": "Europe"
+    },
+    {
+      "city": "Zagreb",
+      "country": "Croatia",
+      "continent": "Europe",
+      "airportCodes": [
+        "ZAG"
+      ]
+    },
+    {
+      "city": "Larnaca",
+      "country": "Cyprus",
+      "continent": "Europe",
+      "airportCodes": [
+        "LCA"
+      ]
+    },
+    {
+      "city": "Paphos",
+      "country": "Cyprus",
+      "continent": "Europe"
+    },
+    {
+      "city": "Brno",
+      "country": "Czechia",
+      "continent": "Europe"
+    },
+    {
+      "city": "Ostrava",
+      "country": "Czechia",
+      "continent": "Europe"
+    },
+    {
+      "city": "Prague",
+      "country": "Czechia",
+      "continent": "Europe",
+      "airportCodes": [
+        "PRG"
+      ]
+    },
+    {
+      "city": "Aalborg",
+      "country": "Denmark",
+      "continent": "Europe"
+    },
+    {
+      "city": "Aarhus",
+      "country": "Denmark",
+      "continent": "Europe"
+    },
+    {
+      "city": "Billund",
+      "country": "Denmark",
+      "continent": "Europe",
+      "airportCodes": [
+        "BLL"
+      ]
+    },
+    {
+      "city": "Copenhagen",
+      "country": "Denmark",
+      "continent": "Europe",
+      "airportCodes": [
+        "CPH"
+      ]
+    },
+    {
+      "city": "Karup",
+      "country": "Denmark",
+      "continent": "Europe"
+    },
+    {
+      "city": "Roskilde",
+      "country": "Denmark",
+      "continent": "Europe"
+    },
+    {
+      "city": "Sönderborg",
+      "country": "Denmark",
+      "continent": "Europe"
+    },
+    {
+      "city": "Tallinn",
+      "country": "Estonia",
+      "continent": "Europe",
+      "airportCodes": [
+        "TLL"
+      ]
+    },
+    {
+      "city": "Helsinki",
+      "country": "Finland",
+      "continent": "Europe",
+      "airportCodes": [
+        "HEL"
+      ]
+    },
+    {
+      "city": "Ivalo",
+      "country": "Finland",
+      "continent": "Europe"
+    },
+    {
+      "city": "Kuopio",
+      "country": "Finland",
+      "continent": "Europe"
+    },
+    {
+      "city": "Mariehamn",
+      "country": "Finland",
+      "continent": "Europe"
+    },
+    {
+      "city": "Rovaniemi",
+      "country": "Finland",
+      "continent": "Europe"
+    },
+    {
+      "city": "Tampere",
+      "country": "Finland",
+      "continent": "Europe"
+    },
+    {
+      "city": "Turku",
+      "country": "Finland",
+      "continent": "Europe"
+    },
+    {
+      "city": "Vasa",
+      "country": "Finland",
+      "continent": "Europe"
+    },
+    {
+      "city": "Annecy/meythet",
+      "country": "France",
+      "continent": "Europe"
+    },
+    {
+      "city": "Basel",
+      "country": "France",
+      "continent": "Europe"
+    },
+    {
+      "city": "Bastia",
+      "country": "France",
+      "continent": "Europe"
+    },
+    {
+      "city": "Beziers-vias",
+      "country": "France",
+      "continent": "Europe"
+    },
+    {
+      "city": "Biarritz",
+      "country": "France",
+      "continent": "Europe"
+    },
+    {
+      "city": "Bordeaux",
+      "country": "France",
+      "continent": "Europe"
+    },
+    {
+      "city": "Brest",
+      "country": "France",
+      "continent": "Europe"
+    },
+    {
+      "city": "Deauville",
+      "country": "France",
+      "continent": "Europe"
+    },
+    {
+      "city": "Dole/tavaux",
+      "country": "France",
+      "continent": "Europe"
+    },
+    {
+      "city": "Grenoble",
+      "country": "France",
+      "continent": "Europe"
+    },
+    {
+      "city": "Hyere-le Palvestre",
+      "country": "France",
+      "continent": "Europe"
+    },
+    {
+      "city": "Lyon",
+      "country": "France",
+      "continent": "Europe"
+    },
+    {
+      "city": "Marseille",
+      "country": "France",
+      "continent": "Europe"
+    },
+    {
+      "city": "Nice",
+      "country": "France",
+      "continent": "Europe",
+      "airportCodes": [
+        "NCE"
+      ]
+    },
+    {
+      "city": "Orleans",
+      "country": "France",
+      "continent": "Europe"
+    },
+    {
+      "city": "Paris",
+      "country": "France",
+      "continent": "Europe",
+      "airportCodes": [
+        "CDG",
+        "ORY"
+      ]
+    },
+    {
+      "city": "Strasbourg",
+      "country": "France",
+      "continent": "Europe"
+    },
+    {
+      "city": "Toulouse",
+      "country": "France",
+      "continent": "Europe"
+    },
+    {
+      "city": "Villacdublay",
+      "country": "France",
+      "continent": "Europe"
+    },
+    {
+      "city": "Aalen-elchingen",
+      "country": "Germany",
+      "continent": "Europe"
+    },
+    {
+      "city": "Berlin",
+      "country": "Germany",
+      "continent": "Europe",
+      "airportCodes": [
+        "BER"
+      ]
+    },
+    {
+      "city": "Braunschweig",
+      "country": "Germany",
+      "continent": "Europe"
+    },
+    {
+      "city": "Dortmund",
+      "country": "Germany",
+      "continent": "Europe"
+    },
+    {
+      "city": "Düsseldorf",
+      "country": "Germany",
+      "continent": "Europe",
+      "airportCodes": [
+        "DUS"
+      ]
+    },
+    {
+      "city": "Erfurt",
+      "country": "Germany",
+      "continent": "Europe"
+    },
+    {
+      "city": "Frankfurt",
+      "country": "Germany",
+      "continent": "Europe",
+      "airportCodes": [
+        "FRA"
+      ]
+    },
+    {
+      "city": "Hamburg",
+      "country": "Germany",
+      "continent": "Europe",
+      "airportCodes": [
+        "HAM"
+      ]
+    },
+    {
+      "city": "Hannover",
+      "country": "Germany",
+      "continent": "Europe"
+    },
+    {
+      "city": "Ingolstadt",
+      "country": "Germany",
+      "continent": "Europe"
+    },
+    {
+      "city": "Karlsruhe",
+      "country": "Germany",
+      "continent": "Europe"
+    },
+    {
+      "city": "Köln",
+      "country": "Germany",
+      "continent": "Europe"
+    },
+    {
+      "city": "München",
+      "country": "Germany",
+      "continent": "Europe"
+    },
+    {
+      "city": "Münster",
+      "country": "Germany",
+      "continent": "Europe"
+    },
+    {
+      "city": "Nürnberg",
+      "country": "Germany",
+      "continent": "Europe"
+    },
+    {
+      "city": "Oberpfafenhofen",
+      "country": "Germany",
+      "continent": "Europe"
+    },
+    {
+      "city": "Stuttgart",
+      "country": "Germany",
+      "continent": "Europe"
+    },
+    {
+      "city": "(tom)",
+      "country": "Greece",
+      "continent": "Europe"
+    },
+    {
+      "city": "Athens",
+      "country": "Greece",
+      "continent": "Europe",
+      "airportCodes": [
+        "ATH"
+      ]
+    },
+    {
+      "city": "Chania",
+      "country": "Greece",
+      "continent": "Europe"
+    },
+    {
+      "city": "Corfu",
+      "country": "Greece",
+      "continent": "Europe"
+    },
+    {
+      "city": "Ioannina",
+      "country": "Greece",
+      "continent": "Europe"
+    },
+    {
+      "city": "Irakleion",
+      "country": "Greece",
+      "continent": "Europe"
+    },
+    {
+      "city": "Kalamata",
+      "country": "Greece",
+      "continent": "Europe"
+    },
+    {
+      "city": "Karpathos",
+      "country": "Greece",
+      "continent": "Europe"
+    },
+    {
+      "city": "Kavala",
+      "country": "Greece",
+      "continent": "Europe"
+    },
+    {
+      "city": "Kos",
+      "country": "Greece",
+      "continent": "Europe"
+    },
+    {
+      "city": "Mykonos",
+      "country": "Greece",
+      "continent": "Europe"
+    },
+    {
+      "city": "Myrina",
+      "country": "Greece",
+      "continent": "Europe"
+    },
+    {
+      "city": "Mytilene",
+      "country": "Greece",
+      "continent": "Europe"
+    },
+    {
+      "city": "Preveza",
+      "country": "Greece",
+      "continent": "Europe"
+    },
+    {
+      "city": "Rhodes",
+      "country": "Greece",
+      "continent": "Europe",
+      "airportCodes": [
+        "RHO"
+      ]
+    },
+    {
+      "city": "Samos",
+      "country": "Greece",
+      "continent": "Europe"
+    },
+    {
+      "city": "Santorini",
+      "country": "Greece",
+      "continent": "Europe"
+    },
+    {
+      "city": "Skiathos",
+      "country": "Greece",
+      "continent": "Europe"
+    },
+    {
+      "city": "Thessaloniki",
+      "country": "Greece",
+      "continent": "Europe"
+    },
+    {
+      "city": "Zakynthos",
+      "country": "Greece",
+      "continent": "Europe"
+    },
+    {
+      "city": "Budapest",
+      "country": "Hungary",
+      "continent": "Europe",
+      "airportCodes": [
+        "BUD"
+      ]
+    },
+    {
+      "city": "Gyor",
+      "country": "Hungary",
+      "continent": "Europe"
+    },
+    {
+      "city": "Reykjavik",
+      "country": "Iceland",
+      "continent": "Europe",
+      "airportCodes": [
+        "KEF"
+      ]
+    },
+    {
+      "city": "Dublin",
+      "country": "Ireland",
+      "continent": "Europe",
+      "airportCodes": [
+        "DUB"
+      ]
+    },
+    {
+      "city": "Alghero",
+      "country": "Italy",
+      "continent": "Europe"
+    },
+    {
+      "city": "Bari",
+      "country": "Italy",
+      "continent": "Europe"
+    },
+    {
+      "city": "Bologna",
+      "country": "Italy",
+      "continent": "Europe"
+    },
+    {
+      "city": "Bolzano",
+      "country": "Italy",
+      "continent": "Europe"
+    },
+    {
+      "city": "Brindisi",
+      "country": "Italy",
+      "continent": "Europe"
+    },
+    {
+      "city": "Cagliari",
+      "country": "Italy",
+      "continent": "Europe"
+    },
+    {
+      "city": "Catania",
+      "country": "Italy",
+      "continent": "Europe"
+    },
+    {
+      "city": "Florence",
+      "country": "Italy",
+      "continent": "Europe"
+    },
+    {
+      "city": "Grosseto",
+      "country": "Italy",
+      "continent": "Europe"
+    },
+    {
+      "city": "Lamezia Terme",
+      "country": "Italy",
+      "continent": "Europe"
+    },
+    {
+      "city": "Milan",
+      "country": "Italy",
+      "continent": "Europe",
+      "airportCodes": [
+        "MXP"
+      ]
+    },
+    {
+      "city": "Neapel",
+      "country": "Italy",
+      "continent": "Europe"
+    },
+    {
+      "city": "Olbia",
+      "country": "Italy",
+      "continent": "Europe"
+    },
+    {
+      "city": "Palermo",
+      "country": "Italy",
+      "continent": "Europe"
+    },
+    {
+      "city": "Pisa",
+      "country": "Italy",
+      "continent": "Europe"
+    },
+    {
+      "city": "Rome",
+      "country": "Italy",
+      "continent": "Europe",
+      "airportCodes": [
+        "FCO"
+      ]
+    },
+    {
+      "city": "Salerno",
+      "country": "Italy",
+      "continent": "Europe"
+    },
+    {
+      "city": "Trieste",
+      "country": "Italy",
+      "continent": "Europe"
+    },
+    {
+      "city": "Turin",
+      "country": "Italy",
+      "continent": "Europe"
+    },
+    {
+      "city": "Venice",
+      "country": "Italy",
+      "continent": "Europe",
+      "airportCodes": [
+        "VCE"
+      ]
+    },
+    {
+      "city": "Verona",
+      "country": "Italy",
+      "continent": "Europe"
+    },
+    {
+      "city": "Pristina",
+      "country": "Kosovo",
+      "continent": "Europe"
+    },
+    {
+      "city": "Riga",
+      "country": "Latvia",
+      "continent": "Europe",
+      "airportCodes": [
+        "RIX"
+      ]
+    },
+    {
+      "city": "Kaunas",
+      "country": "Lithuania",
+      "continent": "Europe"
+    },
+    {
+      "city": "Vilnius",
+      "country": "Lithuania",
+      "continent": "Europe",
+      "airportCodes": [
+        "VNO"
+      ]
+    },
+    {
+      "city": "Luxembourg",
+      "country": "Luxembourg",
+      "continent": "Europe"
+    },
+    {
+      "city": "Valetta",
+      "country": "Malta",
+      "continent": "Europe"
+    },
+    {
+      "city": "Tivat",
+      "country": "Montenegro",
+      "continent": "Europe"
+    },
+    {
+      "city": "Amsterdam",
+      "country": "Netherlands",
+      "continent": "Europe",
+      "airportCodes": [
+        "AMS"
+      ]
+    },
+    {
+      "city": "Groningen",
+      "country": "Netherlands",
+      "continent": "Europe"
+    },
+    {
+      "city": "Maastricht",
+      "country": "Netherlands",
+      "continent": "Europe"
+    },
+    {
+      "city": "Skopje",
+      "country": "North Macedonia",
+      "continent": "Europe"
+    },
+    {
+      "city": "Bergen",
+      "country": "Norway",
+      "continent": "Europe",
+      "airportCodes": [
+        "BGO"
+      ]
+    },
+    {
+      "city": "Bodö",
+      "country": "Norway",
+      "continent": "Europe"
+    },
+    {
+      "city": "Evenes",
+      "country": "Norway",
+      "continent": "Europe"
+    },
+    {
+      "city": "Haugesund",
+      "country": "Norway",
+      "continent": "Europe"
+    },
+    {
+      "city": "Kirkenes",
+      "country": "Norway",
+      "continent": "Europe"
+    },
+    {
+      "city": "Kristiansand",
+      "country": "Norway",
+      "continent": "Europe"
+    },
+    {
+      "city": "Kristiansund",
+      "country": "Norway",
+      "continent": "Europe"
+    },
+    {
+      "city": "Longyearbyen",
+      "country": "Norway",
+      "continent": "Europe"
+    },
+    {
+      "city": "Molde",
+      "country": "Norway",
+      "continent": "Europe"
+    },
+    {
+      "city": "Oslo",
+      "country": "Norway",
+      "continent": "Europe",
+      "airportCodes": [
+        "OSL"
+      ]
+    },
+    {
+      "city": "Tromsö",
+      "country": "Norway",
+      "continent": "Europe"
+    },
+    {
+      "city": "Trondheim",
+      "country": "Norway",
+      "continent": "Europe",
+      "airportCodes": [
+        "TRD"
+      ]
+    },
+    {
+      "city": "Gdansk",
+      "country": "Poland",
+      "continent": "Europe"
+    },
+    {
+      "city": "Gdynia",
+      "country": "Poland",
+      "continent": "Europe"
+    },
+    {
+      "city": "Krakow",
+      "country": "Poland",
+      "continent": "Europe"
+    },
+    {
+      "city": "Lublin",
+      "country": "Poland",
+      "continent": "Europe"
+    },
+    {
+      "city": "Nowy Dwor Mazowiecki",
+      "country": "Poland",
+      "continent": "Europe"
+    },
+    {
+      "city": "Poznan",
+      "country": "Poland",
+      "continent": "Europe"
+    },
+    {
+      "city": "Rzeszow",
+      "country": "Poland",
+      "continent": "Europe"
+    },
+    {
+      "city": "Warsaw",
+      "country": "Poland",
+      "continent": "Europe",
+      "airportCodes": [
+        "WAW"
+      ]
+    },
+    {
+      "city": "Wroclaw",
+      "country": "Poland",
+      "continent": "Europe"
+    },
+    {
+      "city": "Faro",
+      "country": "Portugal",
+      "continent": "Europe"
+    },
+    {
+      "city": "Funchal",
+      "country": "Portugal",
+      "continent": "Europe"
+    },
+    {
+      "city": "Lisbon",
+      "country": "Portugal",
+      "continent": "Europe",
+      "airportCodes": [
+        "LIS"
+      ]
+    },
+    {
+      "city": "Porto",
+      "country": "Portugal",
+      "continent": "Europe",
+      "airportCodes": [
+        "OPO"
+      ]
+    },
+    {
+      "city": "Bucharest",
+      "country": "Romania",
+      "continent": "Europe",
+      "airportCodes": [
+        "OTP"
+      ]
+    },
+    {
+      "city": "Cluj-napoca",
+      "country": "Romania",
+      "continent": "Europe"
+    },
+    {
+      "city": "Iasi Airport",
+      "country": "Romania",
+      "continent": "Europe"
+    },
+    {
+      "city": "Belgrade",
+      "country": "Serbia",
+      "continent": "Europe",
+      "airportCodes": [
+        "BEG"
+      ]
+    },
+    {
+      "city": "Nis",
+      "country": "Serbia",
+      "continent": "Europe"
+    },
+    {
+      "city": "Bratislava",
+      "country": "Slovakia",
+      "continent": "Europe"
+    },
+    {
+      "city": "Kosice",
+      "country": "Slovakia",
+      "continent": "Europe"
+    },
+    {
+      "city": "Ljubljana",
+      "country": "Slovenia",
+      "continent": "Europe"
+    },
+    {
+      "city": "Alicante",
+      "country": "Spain",
+      "continent": "Europe",
+      "airportCodes": [
+        "ALC"
+      ]
+    },
+    {
+      "city": "Barcelona",
+      "country": "Spain",
+      "continent": "Europe",
+      "airportCodes": [
+        "BCN"
+      ]
+    },
+    {
+      "city": "Bilbao",
+      "country": "Spain",
+      "continent": "Europe"
+    },
+    {
+      "city": "Fuerteventura",
+      "country": "Spain",
+      "continent": "Europe"
+    },
+    {
+      "city": "Girona",
+      "country": "Spain",
+      "continent": "Europe"
+    },
+    {
+      "city": "Gran Canaria",
+      "country": "Spain",
+      "continent": "Europe",
+      "airportCodes": [
+        "LPA"
+      ]
+    },
+    {
+      "city": "Ibiza",
+      "country": "Spain",
+      "continent": "Europe"
+    },
+    {
+      "city": "Lanzarote",
+      "country": "Spain",
+      "continent": "Europe"
+    },
+    {
+      "city": "Madrid",
+      "country": "Spain",
+      "continent": "Europe",
+      "airportCodes": [
+        "MAD"
+      ]
+    },
+    {
+      "city": "Malaga",
+      "country": "Spain",
+      "continent": "Europe"
+    },
+    {
+      "city": "Palma",
+      "country": "Spain",
+      "continent": "Europe"
+    },
+    {
+      "city": "Sevilla",
+      "country": "Spain",
+      "continent": "Europe"
+    },
+    {
+      "city": "Tenerife",
+      "country": "Spain",
+      "continent": "Europe",
+      "airportCodes": [
+        "TFS"
+      ]
+    },
+    {
+      "city": "Valencia",
+      "country": "Spain",
+      "continent": "Europe"
+    },
+    {
+      "city": "Altenrhein",
+      "country": "Switzerland",
+      "continent": "Europe"
+    },
+    {
+      "city": "Bern",
+      "country": "Switzerland",
+      "continent": "Europe"
+    },
+    {
+      "city": "Geneve",
+      "country": "Switzerland",
+      "continent": "Europe"
+    },
+    {
+      "city": "Sion",
+      "country": "Switzerland",
+      "continent": "Europe"
+    },
+    {
+      "city": "Zürich",
+      "country": "Switzerland",
+      "continent": "Europe"
+    },
+    {
+      "city": "Ankara",
+      "country": "Türkiye",
+      "continent": "Europe"
+    },
+    {
+      "city": "Antalya",
+      "country": "Türkiye",
+      "continent": "Europe",
+      "airportCodes": [
+        "AYT"
+      ]
+    },
+    {
+      "city": "Istanbul",
+      "country": "Türkiye",
+      "continent": "Europe",
+      "airportCodes": [
+        "IST",
+        "SAW"
+      ]
+    },
+    {
+      "city": "Izmir",
+      "country": "Türkiye",
+      "continent": "Europe"
+    },
+    {
+      "city": "Konya",
+      "country": "Türkiye",
+      "continent": "Europe"
+    },
+    {
+      "city": "Mugla",
+      "country": "Türkiye",
+      "continent": "Europe"
+    },
+    {
+      "city": "Birmingham",
+      "country": "United Kingdom",
+      "continent": "Europe"
+    },
+    {
+      "city": "Bristol",
+      "country": "United Kingdom",
+      "continent": "Europe"
+    },
+    {
+      "city": "Cambridge",
+      "country": "United Kingdom",
+      "continent": "Europe"
+    },
+    {
+      "city": "Cardiff",
+      "country": "United Kingdom",
+      "continent": "Europe"
+    },
+    {
+      "city": "Edinburgh",
+      "country": "United Kingdom",
+      "continent": "Europe",
+      "airportCodes": [
+        "EDI"
+      ]
+    },
+    {
+      "city": "Farnborough",
+      "country": "United Kingdom",
+      "continent": "Europe"
+    },
+    {
+      "city": "Glasgow",
+      "country": "United Kingdom",
+      "continent": "Europe"
+    },
+    {
+      "city": "Jersey",
+      "country": "United Kingdom",
+      "continent": "Europe"
+    },
+    {
+      "city": "Liverpool",
+      "country": "United Kingdom",
+      "continent": "Europe"
+    },
+    {
+      "city": "London",
+      "country": "United Kingdom",
+      "continent": "Europe",
+      "airportCodes": [
+        "LHR",
+        "LGW",
+        "STN"
+      ]
+    },
+    {
+      "city": "Manchester",
+      "country": "United Kingdom",
+      "continent": "Europe",
+      "airportCodes": [
+        "MAN"
+      ]
+    },
+    {
+      "city": "Newcastle",
+      "country": "United Kingdom",
+      "continent": "Europe"
+    },
+    {
+      "city": "Northolt",
+      "country": "United Kingdom",
+      "continent": "Europe"
+    },
+    {
+      "city": "Norwich",
+      "country": "United Kingdom",
+      "continent": "Europe"
+    },
+    {
+      "city": "Nottingham",
+      "country": "United Kingdom",
+      "continent": "Europe"
+    },
+    {
+      "city": "Oxford",
+      "country": "United Kingdom",
+      "continent": "Europe"
+    },
+    {
+      "city": "Warton",
+      "country": "United Kingdom",
+      "continent": "Europe"
+    },
+    {
+      "city": "Toronto",
+      "country": "Canada",
+      "continent": "North America",
+      "airportCodes": [
+        "YYZ"
+      ]
+    },
+    {
+      "city": "Vancouver",
+      "country": "Canada",
+      "continent": "North America"
+    },
+    {
+      "city": "Punta Cana",
+      "country": "Dominican Republic",
+      "continent": "North America"
+    },
+    {
+      "city": "Cancun",
+      "country": "Mexico",
+      "continent": "North America"
+    },
+    {
+      "city": "Andrews",
+      "country": "United States",
+      "continent": "North America"
+    },
+    {
+      "city": "Atlanta",
+      "country": "United States",
+      "continent": "North America"
+    },
+    {
+      "city": "Bangor",
+      "country": "United States",
+      "continent": "North America"
+    },
+    {
+      "city": "Bedford Ma",
+      "country": "United States",
+      "continent": "North America"
+    },
+    {
+      "city": "Boston",
+      "country": "United States",
+      "continent": "North America"
+    },
+    {
+      "city": "Chicago",
+      "country": "United States",
+      "continent": "North America",
+      "airportCodes": [
+        "ORD"
+      ]
+    },
+    {
+      "city": "Harrisburg",
+      "country": "United States",
+      "continent": "North America"
+    },
+    {
+      "city": "Las Vegas",
+      "country": "United States",
+      "continent": "North America"
+    },
+    {
+      "city": "Los Angeles",
+      "country": "United States",
+      "continent": "North America",
+      "airportCodes": [
+        "LAX"
+      ]
+    },
+    {
+      "city": "Miami",
+      "country": "United States",
+      "continent": "North America",
+      "airportCodes": [
+        "MIA"
+      ]
+    },
+    {
+      "city": "Morristown",
+      "country": "United States",
+      "continent": "North America"
+    },
+    {
+      "city": "Nashville",
+      "country": "United States",
+      "continent": "North America"
+    },
+    {
+      "city": "New York",
+      "country": "United States",
+      "continent": "North America",
+      "airportCodes": [
+        "JFK"
+      ]
+    },
+    {
+      "city": "Pittsburgh",
+      "country": "United States",
+      "continent": "North America"
+    },
+    {
+      "city": "Rochester Mn",
+      "country": "United States",
+      "continent": "North America"
+    },
+    {
+      "city": "Saint Paul",
+      "country": "United States",
+      "continent": "North America"
+    },
+    {
+      "city": "San Diego",
+      "country": "United States",
+      "continent": "North America"
+    },
+    {
+      "city": "San Jose",
+      "country": "United States",
+      "continent": "North America"
+    },
+    {
+      "city": "Seattle",
+      "country": "United States",
+      "continent": "North America"
+    },
+    {
+      "city": "Teterboro",
+      "country": "United States",
+      "continent": "North America"
+    },
+    {
+      "city": "Van Nuys",
+      "country": "United States",
+      "continent": "North America"
+    },
+    {
+      "city": "Westhampton",
+      "country": "United States",
+      "continent": "North America"
+    },
+    {
+      "city": "White Plains/westch.",
+      "country": "United States",
+      "continent": "North America"
+    },
+    {
+      "city": "Bogota Airport",
+      "country": "Colombia",
+      "continent": "South America"
+    }
+  ]
 }

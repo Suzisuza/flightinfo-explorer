@@ -6,7 +6,12 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 from unittest.mock import MagicMock, patch
 
-from flightinfo_app import FlightInfoServiceError, app
+from flightinfo_app import (
+    DESTINATIONS,
+    DESTINATION_SEARCH_OPTIONS,
+    FlightInfoServiceError,
+    app,
+)
 from flightinfo_api_client import (
     check_api_connection,
     fetch_arrivals,
@@ -56,16 +61,34 @@ class HomePageTests(unittest.TestCase):
                 with self.subTest(label=label):
                     self.assertIn(label, page)
             self.assertNotIn("OData query", page)
-            self.assertIn("Filter departures by country", page)
+            self.assertIn("Search destination or country", page)
             self.assertIn('id="destination-country"', page)
             self.assertIn('type="search"', page)
-            self.assertIn('list="destination-countries"', page)
-            self.assertIn('<datalist id="destination-countries">', page)
+            self.assertIn('list="destination-options"', page)
+            self.assertIn('<datalist id="destination-options">', page)
+            self.assertIn('value="Amsterdam, Netherlands"', page)
+            self.assertIn('value="Aalborg, Denmark"', page)
+            self.assertIn('value="Agadir, Morocco"', page)
             self.assertIn('id="check-api-button"', page)
             self.assertNotIn("Quick demo", page)
             self.assertNotIn("In development", page)
             self.assertNotIn("coming soon", page.lower())
             self.assertNotIn("Research build", page)
+        finally:
+            response.close()
+
+    def test_destination_suggestions_cover_the_selected_geographic_scope(self):
+        response = self.client.get("/")
+        try:
+            page = response.get_data(as_text=True)
+            self.assertEqual(len(DESTINATIONS), 255)
+            self.assertEqual(page.count('<option value="'), len(DESTINATION_SEARCH_OPTIONS))
+            self.assertEqual(
+                {destination["continent"] for destination in DESTINATIONS},
+                {"Europe", "Africa", "Asia", "North America", "South America"},
+            )
+            self.assertIn("Aalborg, Denmark", DESTINATION_SEARCH_OPTIONS)
+            self.assertIn("Agadir, Morocco", DESTINATION_SEARCH_OPTIONS)
         finally:
             response.close()
 
@@ -132,6 +155,70 @@ class HomePageTests(unittest.TestCase):
             self.assertEqual(data["destinationCountryFilter"], "Netherlands")
             self.assertEqual(data["flights"][0]["destinationCity"], "Amsterdam")
             self.assertEqual(data["flights"][0]["destinationCountry"], "Netherlands")
+        finally:
+            response.close()
+
+    @patch("flightinfo_app.fetch_departures_query")
+    def test_departures_route_filters_by_mapped_destination_city(self, fetch_mock):
+        fetch_mock.return_value = {
+            "flights": [
+                {"flightId": "KL1100", "flightLegIdentifier": {"arrivalAirportIata": "AMS"}},
+                {"flightId": "BA770", "flightLegIdentifier": {"arrivalAirportIata": "LHR"}},
+            ],
+            "numberOfFlights": 2,
+        }
+
+        response = self.client.get(
+            "/api/departures?airport=ARN&date=2026-11-26&destination=Amsterdam%2C%20Netherlands"
+        )
+        try:
+            self.assertEqual(response.status_code, 200)
+            data = response.get_json()
+            self.assertEqual(data["numberOfFlights"], 1)
+            self.assertEqual(data["destinationFilter"], "Amsterdam, Netherlands")
+            self.assertEqual(data["flights"][0]["destinationAirportIata"], "AMS")
+        finally:
+            response.close()
+
+    @patch("flightinfo_app.fetch_departures_query")
+    def test_departures_route_maps_api_city_text_without_iata_lookup(self, fetch_mock):
+        fetch_mock.return_value = {
+            "flights": [
+                {"flightId": "D85050", "arrivalAirportEnglish": "Aalborg"},
+                {"flightId": "KL1100", "arrivalAirportEnglish": "Amsterdam"},
+            ],
+            "numberOfFlights": 2,
+        }
+
+        response = self.client.get(
+            "/api/departures?airport=ARN&date=2026-11-26&destination=Aalborg%2C%20Denmark"
+        )
+        try:
+            self.assertEqual(response.status_code, 200)
+            data = response.get_json()
+            self.assertEqual(data["numberOfFlights"], 1)
+            self.assertEqual(data["flights"][0]["destinationCity"], "Aalborg")
+            self.assertEqual(data["flights"][0]["destinationCountry"], "Denmark")
+        finally:
+            response.close()
+
+    @patch("flightinfo_app.fetch_departures_query")
+    def test_departures_route_matches_known_english_city_alias(self, fetch_mock):
+        fetch_mock.return_value = {
+            "flights": [
+                {"flightId": "LH2415", "flightLegIdentifier": {"arrivalAirportIata": "MUC"}},
+            ],
+            "numberOfFlights": 1,
+        }
+
+        response = self.client.get(
+            "/api/departures?airport=ARN&date=2026-11-26&destination=M%C3%BCnchen%2C%20Germany"
+        )
+        try:
+            self.assertEqual(response.status_code, 200)
+            data = response.get_json()
+            self.assertEqual(data["numberOfFlights"], 1)
+            self.assertEqual(data["flights"][0]["destinationCity"], "München")
         finally:
             response.close()
 

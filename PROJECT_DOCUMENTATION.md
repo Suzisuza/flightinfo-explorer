@@ -2,122 +2,125 @@
 
 ## 1. Project overview
 
-FlightInfo Explorer is a browser application built with Python, Flask, HTML, CSS, and JavaScript. It recreates the main workflow observed in the supplied Swedavia FlightInfo reference: choose an airport and date, select arrivals or departures, and read flight results in a list.
+FlightInfo Explorer is a browser application built with Python, Flask, HTML, CSS, and JavaScript. It was created as a reverse-engineering project based on the supplied Swedavia FlightInfo reference application and video. The goal was to inspect the visible application, infer its inputs and data flow, and build a similar flight-information experience.
 
-This is an independent reverse-engineering school project. It is not an official Swedavia application.
+This is an independent school project and is not an official Swedavia product.
 
-## 2. Research and requirements
+## 2. Phase 1 — Research and planning
 
-The reference application and the supplied video were reviewed to identify the visible inputs, flight list, date selection, direction tabs, destination information, and API connection feature. The assignment describes reverse engineering as inspecting an existing result, inferring its inputs and process, sketching the logic, and building an application with similar output.
+### Reference research
 
-The Swedavia FlightInfo API v2 guide was checked before building requests. It documents arrivals and departures operations and a public OData query endpoint. The OData query supports a `filter`, `continuationtoken`, and `count`; its filter can select fields including airport, flight type, scheduled date, and flight ID. The application uses the query endpoint for departures with airport, date, and departure type conditions. The API documentation is available at [Swedavia FlightInfo API guide](https://apideveloper.swedavia.se/content/Using_the_FlightInfo_API.pdf).
+The reference application was reviewed to identify its visible purpose and behavior: choosing an airport and date, switching between arrivals and departures, viewing flights in time order, and searching/filtering destinations. The assignment describes a reverse-engineering process: inspect an existing result, infer likely inputs and processing, sketch the logic, then implement an application with similar output.
 
-The core requirements inferred from the reference were:
+The Swedavia FlightInfo API v2 guide was checked before implementing API requests. It documents the arrival and departure operations and the public OData query endpoint. Departures in this project use OData filtering by airport, scheduled date, and flight type. The guide is available at [Swedavia FlightInfo API v2 documentation](https://apideveloper.swedavia.se/content/Using_the_FlightInfo_API.pdf).
 
-- Select one of the ten airport codes shown in the application.
-- Select arrivals or departures and a date.
-- Present flight information as readable cards, sorted by scheduled time.
-- Limit the visible list to 50 flights per page.
-- Filter departures by destination country.
-- Provide an on-page way to check whether the FlightInfo API responds.
+Swedavia's [official destination statistics page](https://www.swedavia.se/om-swedavia/statistik/) describes its destination statistics as passenger traffic between Swedavia airports and destinations. The local search list was built from the linked [2025 destination statistics workbook](https://www.swedavia.se/contentassets/95dc75e405f0460fb852949b4b7cb09f/destinations-statistik-2025.xlsx).
 
-The API key is read from a local text file outside the project. The key is not part of the source code, repository, or project ZIP.
+### Requirements inferred from the reference and assignment
 
-## 3. Design and data decisions
+- Provide a browser interface with ten Swedavia airport choices.
+- Let users select arrivals or departures and a date.
+- Display readable flight cards in scheduled-time order, 50 per page.
+- Let users type a destination or country to filter departures.
+- Include OData-based departure requests and a way to check the FlightInfo API connection.
+- Explain the research, implementation, tests, problems and solutions, and final result in English.
 
-Python and Flask handle server routes and calls to the external API. HTML defines the browser page, CSS handles its appearance, and JavaScript manages selection, search, sorting, pagination, and display. This separates the browser interface from API credentials and server-side request handling.
+### Plan and tools
 
-The Swedavia FlightInfo response provides destination airport identifiers but not a complete country name mapping for the interface. Therefore `data/city_country.json` contains a manually curated lookup from common IATA airport codes to city and country names. This lookup is a starter dataset, not a complete or official Swedavia route list. The country filter only matches destinations present in that file; an unknown destination code cannot be assigned a country by the application.
+Python and Flask were chosen for the server and API calls. HTML defines the page, CSS styles it, and JavaScript handles browser interactions. JSON stores the destination lookup. The API key stays in a local file outside the project folder.
 
-The documented OData filters used by the project do not supply the destination country mapping. OData is used to select the departure records by airport, scheduled date, and flight type. The country filter is then applied in Flask using the local JSON lookup.
+## 3. Phase 2 — Building the application
 
-The connection check sends one small authenticated request through the public OData query endpoint, asking for at most one record for ARN departures on the computer's local date. It reports whether the request received a usable API response. This check uses the documented public query operation rather than relying on a separate portal `heartBeat` operation.
+### Main parts and request flow
 
-## 4. Implementation
+1. The user chooses an airport, flight direction, date, and optionally a destination or country.
+2. `static/flight_search.js` sends those selections to the local Flask server.
+3. `flightinfo_app.py` validates the inputs and selects the corresponding API client function.
+4. `flightinfo_api_client.py` loads the local subscription key and sends a request to the documented FlightInfo API.
+5. Swedavia returns JSON data. Flask passes the result to the browser, where JavaScript creates readable flight cards from the fields that are present.
 
-### Project files
+JSON is a structured data format containing named values and nested objects. FlightInfo returns flight data as JSON, and the application reads selected values such as flight number, time, airline, route, and status rather than showing the raw response.
 
-| File or folder | Responsibility |
-|---|---|
-| `start_flightinfo.bat` | Creates the local Python environment if necessary, installs dependencies, starts Flask, and opens the browser on Windows. |
-| `flightinfo_app.py` | Flask entry point and routes for the page, arrivals, departures, and API connection check. It enriches departures and applies the country filter. |
-| `flightinfo_api_client.py` | Validates airport codes and dates, loads the local API key, sends authenticated requests, builds OData queries, and translates API errors. |
-| `data/city_country.json` | Curated airport-code, city, and country lookup for common destinations. |
-| `templates/index.html` | Page structure, airport choices, direction tabs, date, country filter, results area, and connection controls. |
-| `static/flight_search.js` | Sends searches, displays results, formats times, sorts and paginates flights, filters by country, and updates connection status. |
-| `static/flightinfo_design.css` | Page colours, layout, cards, hover effects, and responsive design. |
-| `tests/test_flightinfo_app.py` | Automated tests for page content, routes, filtering, API request construction, error handling, and pagination. |
-| `requirements.txt` | Python dependencies needed to run the project. |
-| `README.md` | Setup, launch, key-file, feature, and test instructions. |
-| `PROJECT_SUMMARY.md` | Short overview of the application and current scope. |
-| `CODE_EXPLANATION.txt` | Plain-language explanation of the important code and data flow. |
+### Destination search and data choices
 
-### Request and response flow
+`data/city_country.json` contains the ten-airport display mapping and the type-ahead destination list. The destination list has **255 city-and-country pairs in 51 countries**: all destinations listed for European countries in Swedavia's 2025 statistics, plus destinations in selected countries in Africa, Asia, North America, and South America. The 2025 source does not list an Oceania destination with passenger traffic, so none was added. The workbook includes historical traffic data; it does not guarantee that a route operates on every selected travel date.
 
-1. A user selects an airport, direction, date, and optionally a country for departures.
-2. JavaScript sends the selected values to Flask at `/api/arrivals` or `/api/departures`.
-3. Flask validates the input and calls `flightinfo_api_client.py`.
-4. The API client reads a local subscription key and sends the request to Swedavia.
-5. Swedavia returns JSON data. Flask returns it to the browser, and JavaScript builds readable flight cards from fields present in the response.
+The search field uses an HTML `datalist`, so its suggestions narrow as the user types. Suggestions include both country names and `City, Country` labels. When filtering, Flask maps a destination IATA code through the local lookup where available. If a code is not in that lookup, it can use the destination city text returned by FlightInfo to match a unique city in the 2025 destination list. Country or city filtering is applied to the departures returned by the API.
 
-JSON is a structured data format consisting of named values and nested objects. It is used for the API response and for the local destination lookup. The browser uses the relevant JSON fields instead of showing the full raw response.
+### OData and API connection check
 
-### OData and country filtering
-
-The departures client builds an OData query using a filter in this form:
+The departure client sends the documented OData query with a filter shaped like:
 
 ```text
 airport eq 'ARN' and scheduled eq 'YYMMDD' and flightType eq 'D'
 ```
 
-The date is formatted as required by the documented query example. The request also asks for up to 1,000 records so that the page can paginate the returned set locally in groups of 50. The country search field offers suggestions populated from country names in `city_country.json`. The user can type a country name and choose a matching suggestion. Flask maps each returned destination IATA code to the local lookup and filters the departure records by the entered country.
+The date format follows the API guide. The request asks for up to 1,000 records; the browser then paginates the returned flights in groups of 50. Destination-country matching is done locally because the OData filter in this application selects airport, date, and flight type.
 
-### API connection check
+The page's **Check connection** control calls the local `/api/heartbeat` route. Flask makes a small authenticated public OData request with a result count of one. The control reports whether that request succeeded at that time; it does not use the portal's internal `heartBeat` operation.
 
-The page's **Check connection** button calls `/api/heartbeat` on the local Flask server. Flask then makes one authenticated OData query to the public FlightInfo service. A successful response indicates that this particular request worked at that time. A failure is shown as unavailable. The check depends on internet access, a working local server, and a valid key/subscription; it is not a guarantee that every API operation is available.
+### Important files
 
-## 5. Testing and current evidence
+| File or folder | Purpose |
+|---|---|
+| `flightinfo_app.py` | Flask page and API routes, input validation, destination enrichment, and filtering. |
+| `flightinfo_api_client.py` | Key loading, request construction, OData query, and API error handling. |
+| `data/city_country.json` | Airport labels and the Swedavia 2025 destination suggestions used for local filtering. |
+| `templates/index.html` | Browser page structure, airport choices, tabs, date, search field, and results area. |
+| `static/flight_search.js` | Browser search, sorting, rendering, pagination, and connection status. |
+| `static/flightinfo_design.css` | Page colors, layout, cards, hover effects, and responsive styles. |
+| `tests/test_flightinfo_app.py` | Automated checks for page content, routes, filtering, API requests, and pagination. |
+| `start_flightinfo.bat` | Windows launcher that prepares the environment, starts Flask, and opens the app. |
+| `requirements.txt` | Python packages required to run the application. |
+| `README.md` | Setup, launch, API-key location, feature, and test instructions. |
+| `PROJECT_SUMMARY.md` | Short overview of the project. |
+| `CODE_EXPLANATION.txt` | Plain-language explanation of the important code and data flow. |
 
-The automated suite was run locally with:
+## 4. Phase 3 — Testing and completion
+
+The automated checks are run from the project folder with:
 
 ```powershell
 .venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
-The latest run completed **18 tests successfully**. Tests cover the home page, API routes, invalid input, destination country matching, invalid country selection, the heartbeat route's success and failure handling, the OData URL/filter/count/header, static assets, and 50-flight pagination. External API requests are mocked in these automated tests, so the test run does not prove that a live key or every live airport/date combination works.
+The latest local run completed **22 tests successfully**.
 
-Earlier manual checks confirmed that the Flask page and its CSS, JavaScript, and image assets loaded in the browser. A documented arrivals request was also submitted using the API portal's Try it control and returned `HTTP/1.1 200 OK`. The newly added country filter and OData departures implementation are covered by local tests; they should also be demonstrated with the user's live key before being treated as manually verified against the live service.
+The tests cover the page, arrivals and departures routes, OData parameters, destination and country filtering, API connection success/failure handling, static assets, and 50-flight pagination. API calls are mocked in automated tests, so these tests do not prove that a live key or every date and airport works against Swedavia.
 
-## 6. Problems encountered and solutions
+The browser was manually opened through the Windows launcher. The page and its CSS, JavaScript, and image assets loaded locally. The API portal's Try it request for arrivals returned `HTTP/1.1 200 OK`. A live departures check should be made separately with a valid local key because subscriptions, dates, airports, and service availability can affect results.
 
-| Problem | Solution or current handling |
+The application includes arrival search, OData-based departure search, destination and country type-ahead filtering, readable results, 50-item pagination, and an API connection check. The project source and supporting setup files are stored in the GitHub repository.
+
+## 5. Phase 4 — Problems and solutions
+
+| Problem | Solution |
 |---|---|
-| Flask initially tried to import `app` after the file was named `flightinfo_app.py`. | The launch configuration was changed to use the actual module name. |
-| Starting from the parent folder made `.venv` paths fail. | The Windows launcher changes to its own project directory before using the environment. |
-| Raw JSON was difficult to read. | JavaScript turns available response fields into readable flight cards. |
-| Some flight records omit optional values. | The renderer only displays optional details when the API provides them. The status badge shows the status returned by the API, including “Deleted” when that is the returned status. |
-| No documented country field was available for the interface's country search. | A local JSON airport-to-country lookup was added. It is explicitly limited to the airport codes it contains. |
-| Windows may not have an IANA timezone database installed for Python's `ZoneInfo`. | The connection check uses the computer's local date, avoiding an extra timezone-data dependency. |
-| The browser could not contact the local app when Flask was not running. | The server must remain running while the browser is in use; the Windows launcher starts it and opens the page. |
+| Flask tried to import `app` after the entry point was named `flightinfo_app.py`. | The launch configuration was changed to use the actual module name. |
+| A launch command failed when run from the parent folder because `.venv` was inside the project folder. | `start_flightinfo.bat` changes to its own folder before using the environment. The README gives the correct command for both folder locations. |
+| Raw JSON was difficult to read as a flight board. | JavaScript turns available response fields into readable flight cards. |
+| Some API records do not contain every optional detail. | The page displays optional fields only when present and uses the API's returned status text. |
+| FlightInfo destination codes do not include a complete city and country lookup. | The local JSON list was expanded from Swedavia's official 2025 destination statistics; returned city text is used when a code is not mapped. |
+| The browser could not contact the local application when Flask was not running. | Keep the server window open while using the browser; the launcher starts Flask and opens the page. |
 
-## 7. Run the application
+## 6. Conclusion and possible improvements
 
-On Windows, find the folder shown at the end of the PowerShell prompt and use the matching command. If the prompt ends with `...\Swedavia FlightInfo>`, run:
+The project recreates the core flight-search workflow identified in the reference and connects it to the documented FlightInfo API. The work demonstrates how browser code, a Flask server, an API client, JSON data, and an external API work together. The destination suggestions are based on 2025 passenger statistics, so future improvements could refresh the local list and verify city-name matching against new FlightInfo responses. Live behavior also depends on a valid subscription key and the API's current data.
+
+## 7. Run the application on Windows
+
+In VS Code, look at the folder shown at the end of the PowerShell prompt.
+
+If it ends with `...\Swedavia FlightInfo>`, run:
 
 ```powershell
 & ".\API projekt\start_flightinfo.bat"
 ```
 
-If the prompt ends with `...\Swedavia FlightInfo\API projekt>`, run:
+If it ends with `...\Swedavia FlightInfo\API projekt>`, run:
 
 ```powershell
 .\start_flightinfo.bat
 ```
 
-You can also double-click the launcher from File Explorer. The app opens at `http://127.0.0.1:5000/`. Keep its server window open while using the page. For live API requests, save the user's own subscription key outside the project as described in `README.md`.
-
-## 8. Conclusion and remaining limits
-
-The application now includes arrival searches, OData-based departure searches, country filtering through a local JSON lookup, readable and paginated results, and an API connection check. It demonstrates how the browser interface, Flask server, API client, JSON data, and external service fit together.
-
-The country lookup is not exhaustive, and a destination not listed in the file cannot be matched to a country. Automated tests use mocked API responses. Live API behaviour can vary by subscription, date, airport, API availability, and returned data, so those cases require a separate live check.
+The launcher opens the local app at `http://127.0.0.1:5000/`. Keep the server window open while using the page. Live searches require the user's subscription key saved outside the project, as described in `README.md`.

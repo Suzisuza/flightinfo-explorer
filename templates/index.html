@@ -59,11 +59,11 @@
             <button class="search-button" type="submit">Show arrivals</button>
           </form>
           <div class="country-filter" id="country-filter" hidden>
-            <label for="destination-country">Filter departures by country</label>
-            <input id="destination-country" name="country" type="search" list="destination-countries" placeholder="Type a country name" autocomplete="off">
-            <datalist id="destination-countries">
-              {% for country in destination_countries %}
-              <option value="{{ country }}">{{ country }}</option>
+            <label for="destination-country">Search destination or country</label>
+            <input id="destination-country" name="destination" type="search" list="destination-options" placeholder="Type a destination or country" autocomplete="off">
+            <datalist id="destination-options">
+              {% for option in destination_search_options %}
+              <option value="{{ option }}">
               {% endfor %}
             </datalist>
           </div>

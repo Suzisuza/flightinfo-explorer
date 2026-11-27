@@ -15,8 +15,8 @@ const paginationControls = document.querySelector("#flight-pagination");
 const previousPageButton = document.querySelector("#previous-page");
 const nextPageButton = document.querySelector("#next-page");
 const paginationInfo = document.querySelector("#pagination-info");
-const countryFilterPanel = document.querySelector("#country-filter");
-const countryFilter = document.querySelector("#destination-country");
+const destinationFilterPanel = document.querySelector("#country-filter");
+const destinationSearchInput = document.querySelector("#destination-country");
 const apiStatusText = document.querySelector("#api-status-text");
 const checkApiButton = document.querySelector("#check-api-button");
 
@@ -98,7 +98,7 @@ function createStatusBadge(statusText) {
 
 function selectFlightMode(mode) {
   selectedMode = mode;
-  countryFilterPanel.hidden = mode !== "departures";
+  destinationFilterPanel.hidden = mode !== "departures";
   const label = mode === "arrivals" ? "Arrivals" : "Departures";
   resultsTitle.textContent = `${label} results`;
   searchButton.textContent = `Show ${label.toLowerCase()}`;
@@ -134,10 +134,10 @@ function renderFlights(data) {
     (first, second) => scheduledTimestamp(first) - scheduledTimestamp(second),
   );
   currentPage = 0;
-  const countryDescription = selectedMode === "departures" && countryFilter.value
-    ? ` to ${countryFilter.value}`
+  const destinationDescription = selectedMode === "departures" && destinationSearchInput.value
+    ? ` to ${destinationSearchInput.value}`
     : "";
-  resultMessage.textContent = `${sortedFlights.length} ${action} ${airportPhrase} ${airportNames[selectedAirport] || selectedAirport}${countryDescription} on ${dateInput.value}. Sorted from earliest to latest by scheduled time. Times are shown in Stockholm local time.`;
+  resultMessage.textContent = `${sortedFlights.length} ${action} ${airportPhrase} ${airportNames[selectedAirport] || selectedAirport}${destinationDescription} on ${dateInput.value}. Sorted from earliest to latest by scheduled time. Times are shown in Stockholm local time.`;
   renderFlightPage();
 }
 
@@ -292,8 +292,8 @@ flightForm.addEventListener("submit", async (event) => {
     airport: selectedAirport,
     date: dateInput.value,
   });
-  if (selectedMode === "departures" && countryFilter.value) {
-    parameters.set("country", countryFilter.value);
+  if (selectedMode === "departures" && destinationSearchInput.value) {
+    parameters.set("destination", destinationSearchInput.value);
   }
 
   try {
