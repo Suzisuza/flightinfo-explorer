@@ -3,10 +3,16 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from urllib.parse import parse_qs, urlsplit
 from unittest.mock import MagicMock, patch
 
-from flightinfo_app import app
-from flightinfo_api_client import fetch_arrivals, fetch_departures
+from flightinfo_app import FlightInfoServiceError, app
+from flightinfo_api_client import (
+    check_api_connection,
+    fetch_arrivals,
+    fetch_departures,
+    fetch_departures_query,
+)
 
 
 class HomePageTests(unittest.TestCase):
@@ -46,10 +52,13 @@ class HomePageTests(unittest.TestCase):
                     self.assertIn(airport, page)
             self.assertNotIn("airport-chip-active", page)
             self.assertNotIn("+ 6 more", page)
-            for label in ("Arrivals", "Departures", "Find a flight", "API status"):
+            for label in ("Arrivals", "Departures", "Find a flight", "API connection"):
                 with self.subTest(label=label):
                     self.assertIn(label, page)
             self.assertNotIn("OData query", page)
+            self.assertIn("Filter departures by country", page)
+            self.assertIn('id="destination-country"', page)
+            self.assertIn('id="check-api-button"', page)
             self.assertNotIn("Quick demo", page)
             self.assertNotIn("In development", page)
             self.assertNotIn("coming soon", page.lower())
@@ -87,9 +96,9 @@ class HomePageTests(unittest.TestCase):
         finally:
             response.close()
 
-    @patch("flightinfo_app.fetch_departures")
+    @patch("flightinfo_app.fetch_departures_query")
     def test_departures_route_returns_service_data(self, fetch_mock):
-        expected = {"NumberOfFlights": 0, "Flights": []}
+        expected = {"flights": [], "numberOfFlights": 0}
         fetch_mock.return_value = expected
 
         response = self.client.get("/api/departures?airport=ARN&date=2026-11-26")
@@ -97,6 +106,59 @@ class HomePageTests(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.get_json(), expected)
             fetch_mock.assert_called_once_with("ARN", "2026-11-26")
+        finally:
+            response.close()
+
+    @patch("flightinfo_app.fetch_departures_query")
+    def test_departures_route_filters_by_mapped_destination_country(self, fetch_mock):
+        fetch_mock.return_value = {
+            "flights": [
+                {"flightId": "KL1100", "flightLegIdentifier": {"arrivalAirportIata": "AMS"}},
+                {"flightId": "BA770", "flightLegIdentifier": {"arrivalAirportIata": "LHR"}},
+            ],
+            "numberOfFlights": 2,
+        }
+
+        response = self.client.get(
+            "/api/departures?airport=ARN&date=2026-11-26&country=Netherlands"
+        )
+        try:
+            self.assertEqual(response.status_code, 200)
+            data = response.get_json()
+            self.assertEqual(data["numberOfFlights"], 1)
+            self.assertEqual(data["destinationCountryFilter"], "Netherlands")
+            self.assertEqual(data["flights"][0]["destinationCity"], "Amsterdam")
+            self.assertEqual(data["flights"][0]["destinationCountry"], "Netherlands")
+        finally:
+            response.close()
+
+    @patch("flightinfo_app.fetch_departures_query")
+    def test_departures_route_rejects_country_not_in_destination_list(self, fetch_mock):
+        response = self.client.get(
+            "/api/departures?airport=ARN&date=2026-11-26&country=Atlantis"
+        )
+        try:
+            self.assertEqual(response.status_code, 400)
+            fetch_mock.assert_not_called()
+        finally:
+            response.close()
+
+    @patch("flightinfo_app.check_api_connection")
+    def test_heartbeat_route_reports_connected(self, heartbeat_mock):
+        response = self.client.get("/api/heartbeat")
+        try:
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.get_json()["status"], "connected")
+            heartbeat_mock.assert_called_once_with()
+        finally:
+            response.close()
+
+    @patch("flightinfo_app.check_api_connection", side_effect=FlightInfoServiceError("The API is unavailable."))
+    def test_heartbeat_route_reports_api_failure(self, _heartbeat_mock):
+        response = self.client.get("/api/heartbeat")
+        try:
+            self.assertEqual(response.status_code, 502)
+            self.assertEqual(response.get_json()["status"], "unavailable")
         finally:
             response.close()
 
@@ -111,6 +173,7 @@ class HomePageTests(unittest.TestCase):
             self.assertIn(".arrival-list", css)
             self.assertIn(".flight-mode-tab[aria-selected=\"true\"]", css)
             self.assertIn(".flight-pagination[hidden]", css)
+            self.assertIn(".country-filter select", css)
             self.assertIn(".pagination-button", css)
             hover_rule = css.split(".airport-chip:hover {", 1)[1].split("}", 1)[0]
             self.assertIn("background-color: gold", hover_rule)
@@ -208,6 +271,67 @@ class FlightInfoClientTests(unittest.TestCase):
                 "https://api.swedavia.se/flightinfo/v2/ARN/departures/2026-11-26",
             )
             self.assertEqual(data, {"NumberOfFlights": 0, "Flights": []})
+
+    def test_fetch_departures_query_uses_documented_odata_parameters(self):
+        with tempfile.TemporaryDirectory() as temporary_folder:
+            secret_folder = Path(temporary_folder) / "FlightInfoSecrets"
+            secret_folder.mkdir()
+            (secret_folder / "swedavia_primary_key.txt").write_text(
+                "test-key-only-for-unit-test", encoding="utf-8"
+            )
+
+            mocked_response = MagicMock()
+            mocked_response.__enter__.return_value = mocked_response
+            mocked_response.read.return_value = json.dumps(
+                {"Flights": [{"flightId": "SK123"}], "continuationtoken": "next"}
+            ).encode("utf-8")
+
+            with patch.dict(os.environ, {"LOCALAPPDATA": temporary_folder}):
+                with patch("flightinfo_api_client.urlopen", return_value=mocked_response) as urlopen_mock:
+                    data = fetch_departures_query("ARN", "2026-11-26")
+
+            request = urlopen_mock.call_args.args[0]
+            self.assertEqual(request.get_method(), "GET")
+            self.assertEqual(
+                request.get_header("Ocp-apim-subscription-key"),
+                "test-key-only-for-unit-test",
+            )
+            self.assertEqual(
+                urlsplit(request.full_url).path,
+                "/flightinfo/v2/query",
+            )
+            parameters = parse_qs(urlsplit(request.full_url).query)
+            self.assertEqual(
+                parameters["filter"][0],
+                "airport eq 'ARN' and scheduled eq '261126' and flightType eq 'D'",
+            )
+            self.assertEqual(parameters["count"], ["1000"])
+            self.assertEqual(data["flights"], [{"flightId": "SK123"}])
+            self.assertEqual(data["numberOfFlights"], 1)
+            self.assertEqual(data["continuationtoken"], "next")
+
+    def test_api_connection_check_uses_one_public_odata_result(self):
+        with tempfile.TemporaryDirectory() as temporary_folder:
+            secret_folder = Path(temporary_folder) / "FlightInfoSecrets"
+            secret_folder.mkdir()
+            (secret_folder / "swedavia_primary_key.txt").write_text(
+                "test-key-only-for-unit-test", encoding="utf-8"
+            )
+
+            mocked_response = MagicMock()
+            mocked_response.__enter__.return_value = mocked_response
+            mocked_response.read.return_value = json.dumps(
+                {"flights": [], "continuationtoken": "next"}
+            ).encode("utf-8")
+
+            with patch.dict(os.environ, {"LOCALAPPDATA": temporary_folder}):
+                with patch("flightinfo_api_client.urlopen", return_value=mocked_response) as urlopen_mock:
+                    check_api_connection()
+
+            request = urlopen_mock.call_args.args[0]
+            parameters = parse_qs(urlsplit(request.full_url).query)
+            self.assertEqual(parameters["count"], ["1"])
+            self.assertIn("flightType eq 'D'", parameters["filter"][0])
 
     def test_fetch_arrivals_rejects_unsupported_airport_before_network(self):
         with patch("flightinfo_api_client.urlopen") as urlopen_mock:

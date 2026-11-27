@@ -264,6 +264,30 @@ h2 {
   opacity: 0.65;
 }
 
+.country-filter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.country-filter label {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.country-filter select {
+  min-height: 40px;
+  min-width: 220px;
+  padding: 8px 12px;
+  border: 1px solid #75c6dd;
+  border-radius: 8px;
+  background: #ffffff;
+  color: black;
+  font: inherit;
+}
+
 .arrival-results {
   margin-top: 20px;
   padding: 16px;
@@ -441,7 +465,9 @@ h2 {
 .airport-chip:focus-visible,
 .flight-mode-tab:focus-visible,
 .search-button:focus-visible,
-.arrival-search input:focus-visible {
+.arrival-search input:focus-visible,
+.country-filter select:focus-visible,
+.feature-action-button:focus-visible {
   outline: 3px solid #174f75;
   outline-offset: 3px;
 }
@@ -472,6 +498,42 @@ h2 {
   color: black;
   font-size: 11px;
   line-height: 1.5;
+}
+
+.feature-action-button {
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid #237db8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: black;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.feature-action-button:hover {
+  background: gold;
+}
+
+.feature-action-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.api-status-connected {
+  color: #14532d;
+  font-weight: bold;
+}
+
+.api-status-unavailable {
+  color: #8b1d1d;
+  font-weight: bold;
+}
+
+.api-status-pending {
+  color: #4b5563;
 }
 
 /* Footer */

@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from urllib.error import HTTPError, URLError
+from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 
@@ -76,15 +77,11 @@ def validate_arrival_request(airport: str, flight_date: str) -> tuple[str, str]:
     return airport_code, parsed_date.isoformat()
 
 
-def _fetch_flights(direction: str, airport: str, flight_date: str) -> dict:
-    """Fetch flights through a documented public v2 endpoint."""
-    if direction not in {"arrivals", "departures"}:
-        raise ValueError("Choose arrivals or departures.")
-
-    airport_code, requested_date = validate_arrival_request(airport, flight_date)
+def _fetch_api_json(url: str) -> dict | list:
+    """Send an authenticated GET request and parse its JSON response."""
     subscription_key = load_subscription_key()
     request = Request(
-        f"{API_BASE_URL}/{airport_code}/{direction}/{requested_date}",
+        url,
         headers={
             "Accept": "application/json",
             "Ocp-Apim-Subscription-Key": subscription_key,
@@ -108,7 +105,7 @@ def _fetch_flights(direction: str, airport: str, flight_date: str) -> dict:
             ) from error
         raise FlightInfoServiceError(
             f"The FlightInfo service returned HTTP {error.code}.",
-            status_code=502,
+            status_code=error.code,
         ) from error
     except URLError as error:
         raise FlightInfoServiceError(
@@ -126,12 +123,75 @@ def _fetch_flights(direction: str, airport: str, flight_date: str) -> dict:
             "The FlightInfo service returned a response that was not valid JSON."
         ) from error
 
-    if not isinstance(data, dict):
+    if not isinstance(data, (dict, list)):
         raise FlightInfoServiceError(
             "The FlightInfo service returned an unexpected response format."
         )
 
     return data
+
+
+def _fetch_flights(direction: str, airport: str, flight_date: str) -> dict:
+    """Fetch arrivals or departures through the documented v2 endpoint."""
+    if direction not in {"arrivals", "departures"}:
+        raise ValueError("Choose arrivals or departures.")
+
+    airport_code, requested_date = validate_arrival_request(airport, flight_date)
+    return _fetch_api_json(
+        f"{API_BASE_URL}/{airport_code}/{direction}/{requested_date}"
+    )
+
+
+def _normalize_query_response(data: dict | list) -> dict:
+    """Return OData flight records in the same shape used by the web page."""
+    if isinstance(data, list):
+        flights = data
+        response = {}
+    else:
+        response = dict(data)
+        flights = response.get("flights", response.get("Flights", []))
+
+    if not isinstance(flights, list):
+        raise FlightInfoServiceError(
+            "The OData query returned an unexpected flight list."
+        )
+
+    response["flights"] = flights
+    response["numberOfFlights"] = len(flights)
+    return response
+
+
+def _build_departure_filter(airport: str, flight_date: str) -> str:
+    """Build the documented OData filter for one airport, date and direction."""
+    airport_code, requested_date = validate_arrival_request(airport, flight_date)
+    scheduled_date = date.fromisoformat(requested_date).strftime("%y%m%d")
+    return (
+        f"airport eq '{airport_code}' and scheduled eq '{scheduled_date}' "
+        "and flightType eq 'D'"
+    )
+
+
+def fetch_departures_query(airport: str, flight_date: str) -> dict:
+    """Fetch departures using FlightInfo's documented OData query endpoint."""
+    filter_expression = _build_departure_filter(airport, flight_date)
+    query = urlencode({"filter": filter_expression, "count": "1000"})
+    data = _fetch_api_json(f"{API_BASE_URL}/query?{query}")
+    return _normalize_query_response(data)
+
+
+def check_api_connection() -> None:
+    """Probe the public API with one small OData request.
+
+    The portal's separate heartBeat operation is described as internal use only,
+    so this check uses the public query endpoint instead.
+    """
+    # Use the computer's local date so the check works on Windows without
+    # requiring an external time-zone database package.
+    today = datetime.now().astimezone().date()
+    filter_expression = _build_departure_filter("ARN", today.isoformat())
+    query = urlencode({"filter": filter_expression, "count": "1"})
+    data = _fetch_api_json(f"{API_BASE_URL}/query?{query}")
+    _normalize_query_response(data)
 
 
 def fetch_arrivals(airport: str, flight_date: str) -> dict:

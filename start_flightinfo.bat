@@ -22,7 +22,13 @@ if errorlevel 1 goto :install_error
 echo Starting FlightInfo Explorer...
 start "FlightInfo Explorer server" cmd /k ""%~dp0.venv\Scripts\python.exe" -m flask --app flightinfo_app run"
 timeout /t 3 /nobreak >nul
-start "" http://127.0.0.1:5000/
+set "EDGE_EXE=%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe"
+if not exist "%EDGE_EXE%" set "EDGE_EXE=%ProgramFiles%\Microsoft\Edge\Application\msedge.exe"
+if exist "%EDGE_EXE%" (
+    start "" "%EDGE_EXE%" http://127.0.0.1:5000/
+) else (
+    start "" microsoft-edge:http://127.0.0.1:5000/
+)
 exit /b 0
 
 :python_error

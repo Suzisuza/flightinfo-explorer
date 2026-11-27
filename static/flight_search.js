@@ -15,6 +15,10 @@ const paginationControls = document.querySelector("#flight-pagination");
 const previousPageButton = document.querySelector("#previous-page");
 const nextPageButton = document.querySelector("#next-page");
 const paginationInfo = document.querySelector("#pagination-info");
+const countryFilterPanel = document.querySelector("#country-filter");
+const countryFilter = document.querySelector("#destination-country");
+const apiStatusText = document.querySelector("#api-status-text");
+const checkApiButton = document.querySelector("#check-api-button");
 
 let selectedAirport = "ARN";
 let selectedMode = "arrivals";
@@ -94,6 +98,7 @@ function createStatusBadge(statusText) {
 
 function selectFlightMode(mode) {
   selectedMode = mode;
+  countryFilterPanel.hidden = mode !== "departures";
   const label = mode === "arrivals" ? "Arrivals" : "Departures";
   resultsTitle.textContent = `${label} results`;
   searchButton.textContent = `Show ${label.toLowerCase()}`;
@@ -129,7 +134,10 @@ function renderFlights(data) {
     (first, second) => scheduledTimestamp(first) - scheduledTimestamp(second),
   );
   currentPage = 0;
-  resultMessage.textContent = `${sortedFlights.length} ${action} ${airportPhrase} ${airportNames[selectedAirport] || selectedAirport} on ${dateInput.value}. Sorted from earliest to latest by scheduled time. Times are shown in Stockholm local time.`;
+  const countryDescription = selectedMode === "departures" && countryFilter.value
+    ? ` to ${countryFilter.value}`
+    : "";
+  resultMessage.textContent = `${sortedFlights.length} ${action} ${airportPhrase} ${airportNames[selectedAirport] || selectedAirport}${countryDescription} on ${dateInput.value}. Sorted from earliest to latest by scheduled time. Times are shown in Stockholm local time.`;
   renderFlightPage();
 }
 
@@ -195,10 +203,17 @@ function renderFlightPage() {
       ? ["departureAirportEnglish", "DepartureAirportEnglish", "departureAirportSwedish", "DepartureAirportSwedish", "departureAirportIata", "DepartureAirportIata"]
       : ["arrivalAirportEnglish", "ArrivalAirportEnglish", "arrivalAirportSwedish", "ArrivalAirportSwedish", "arrivalAirportIata", "ArrivalAirportIata"];
     const otherAirport = readField(flight, ...destinationField);
+    const destinationCity = selectedMode === "departures"
+      ? readField(flight, "destinationCity", "DestinationCity")
+      : "";
+    const destinationCountry = selectedMode === "departures"
+      ? readField(flight, "destinationCountry", "DestinationCountry")
+      : "";
     const route = document.createElement("p");
     route.className = "flight-route";
-    route.textContent = otherAirport
-      ? `${selectedMode === "arrivals" ? "From" : "To"} ${otherAirport}`
+    const destinationText = [destinationCity, destinationCountry].filter(Boolean).join(", ");
+    route.textContent = otherAirport || destinationText
+      ? `${selectedMode === "arrivals" ? "From" : "To"} ${destinationText || otherAirport}`
       : "Route information unavailable";
     main.append(route);
 
@@ -277,6 +292,9 @@ flightForm.addEventListener("submit", async (event) => {
     airport: selectedAirport,
     date: dateInput.value,
   });
+  if (selectedMode === "departures" && countryFilter.value) {
+    parameters.set("country", countryFilter.value);
+  }
 
   try {
     const response = await fetch(`/api/${selectedMode}?${parameters.toString()}`);
@@ -301,5 +319,26 @@ flightForm.addEventListener("submit", async (event) => {
     flightList.append(errorMessage);
   } finally {
     searchButton.disabled = false;
+  }
+});
+
+checkApiButton.addEventListener("click", async () => {
+  checkApiButton.disabled = true;
+  apiStatusText.textContent = "Checking the FlightInfo API...";
+  apiStatusText.className = "api-status-pending";
+
+  try {
+    const response = await fetch("/api/heartbeat");
+    const data = await response.json();
+    if (!response.ok || data.status !== "connected") {
+      throw new Error(data.message || "The API connection could not be confirmed.");
+    }
+    apiStatusText.textContent = "Connected. The FlightInfo API responded successfully.";
+    apiStatusText.className = "api-status-connected";
+  } catch (error) {
+    apiStatusText.textContent = error.message || "Could not check the API connection.";
+    apiStatusText.className = "api-status-unavailable";
+  } finally {
+    checkApiButton.disabled = false;
   }
 });

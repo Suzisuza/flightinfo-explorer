@@ -58,6 +58,15 @@
             <input id="flight-date" name="date" type="date" required>
             <button class="search-button" type="submit">Show arrivals</button>
           </form>
+          <div class="country-filter" id="country-filter" hidden>
+            <label for="destination-country">Filter departures by country</label>
+            <select id="destination-country" name="country">
+              <option value="">All countries</option>
+              {% for country in destination_countries %}
+              <option value="{{ country }}">{{ country }}</option>
+              {% endfor %}
+            </select>
+          </div>
           <section class="arrival-results" id="arrival-results" aria-live="polite" hidden>
             <h3 id="results-title">Arrival results</h3>
             <p id="arrival-message"></p>
@@ -98,10 +107,11 @@
             <h3>Find a flight</h3>
             <p>Look up a specific flight number.</p>
           </article>
-          <article class="feature-card">
+          <article class="feature-card api-status-card">
             <span class="feature-icon" aria-hidden="true">♥</span>
-            <h3>API status</h3>
-            <p>Check the FlightInfo service response.</p>
+            <h3>API connection</h3>
+            <p id="api-status-text" aria-live="polite">Not checked yet.</p>
+            <button class="feature-action-button" id="check-api-button" type="button">Check connection</button>
           </article>
         </div>
       </section>

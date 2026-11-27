@@ -1,0 +1,74 @@
+FLIGHTINFO EXPLORER — CODE EXPLANATION
+=====================================
+
+Purpose
+-------
+FlightInfo Explorer is a browser application made with Python, Flask, HTML,
+CSS, and JavaScript. It uses the Swedavia FlightInfo API v2 to show flight
+arrivals and departures in a readable format.
+
+How one search works
+--------------------
+1. The user chooses an airport, Arrivals or Departures, and a date in the page.
+2. JavaScript sends those choices to a route in the local Flask application.
+3. Flask validates the request and calls flightinfo_api_client.py.
+4. The API client loads the subscription key from a local file outside the
+   project and sends an authenticated request to Swedavia.
+5. Swedavia returns JSON. Flask passes it to the browser, and JavaScript turns
+   the available fields into flight cards sorted by scheduled time.
+
+Important files
+---------------
+flightinfo_app.py
+This is the Flask application. It serves the webpage and provides routes for
+arrivals, departures, and the API connection check. For departures, it enriches
+each flight with city and country names from data/city_country.json, then applies
+the selected country filter.
+
+flightinfo_api_client.py
+This module validates airport codes and dates, loads the local subscription
+key, makes HTTP GET requests, and handles API errors. Departure searches use
+the documented OData query endpoint. The OData filter selects the airport,
+scheduled date, and departure flight type. The API connection check sends a
+small public query with a result count of one. It does not call the portal's
+separate heartBeat operation, which is documented as internal use only.
+
+data/city_country.json
+This is a local JSON lookup from airport IATA codes to city and country names.
+The backend uses it to label destinations and filter departures by country.
+It is a curated starter list, not a complete or official list of Swedavia
+routes. A destination code missing from the file cannot be matched to a country.
+
+templates/index.html
+This file defines the page structure: airport choices, Arrivals and Departures
+tabs, date field, country filter, results area, and API connection controls.
+
+static/flight_search.js
+This file handles page interactions. It changes the selected flight direction,
+sends searches, renders readable flight cards, formats times for Stockholm,
+sorts results, paginates 50 flights at a time, and displays connection status.
+
+static/flightinfo_design.css
+This file defines colours, spacing, cards, hover effects, and responsive page
+layouts.
+
+JSON and OData
+--------------
+JSON is a structured format made of named fields and values. The API returns
+flight details as JSON, and the application reads the fields it needs instead
+of displaying the raw response. The local country lookup is also stored as
+JSON.
+
+OData is a query format supported by the documented FlightInfo API. The
+application uses an OData filter for departures, for example selecting an
+airport, a scheduled date, and flightType 'D'. Country filtering is applied
+locally after the response because country is supplied by the local lookup,
+not by the documented OData filter used here.
+
+The API connection check
+------------------------
+The page's Check connection button calls Flask's /api/heartbeat route. Flask
+then makes one small authenticated public OData query. A successful response
+shows that the key and public API request worked at that moment. An error is
+reported as unavailable; the check does not diagnose every possible account
+or subscription issue.

@@ -1,9 +1,9 @@
 # Project Summary
 
-FlightInfo Explorer is a browser application built with Python, Flask, HTML, CSS, and JavaScript. It uses the Swedavia FlightInfo API v2 to retrieve arrivals and departures for a selected airport and date. The page offers ten Swedavia airport choices.
+FlightInfo Explorer is a browser application built with Python, Flask, HTML, CSS, and JavaScript. It retrieves arrivals and departures from the Swedavia FlightInfo API v2 and presents the results as readable flight cards.
 
-The Flask backend reads the API subscription key from a local secret file outside the project folder and requests the flight data. The browser displays readable flight cards, orders them by scheduled time, shows times in Stockholm local time, and presents up to 50 flights per page.
+Users can choose from ten Swedavia airports, select a date and flight direction, browse results 50 at a time, and filter departures by destination country. A local JSON lookup maps common destination airport codes to city and country names. The page also provides an API connection check using a small public OData query.
 
-On Windows, start_flightinfo.bat prepares the local Python environment, installs the listed dependencies, starts the Flask server, and opens the browser. Live searches require the user to provide their own local API key; no key is included in the project.
+The application uses documented FlightInfo operations, including the OData query endpoint for departures. The destination lookup is a curated starter dataset, not a complete or official Swedavia route list; destinations absent from the file cannot be assigned to a country filter.
 
-The implemented search features are arrivals and departures. Individual flight lookup and the API status card are not implemented. The automated test suite has 12 passing tests.
+On Windows, `start_flightinfo.bat` prepares the local Python environment, installs dependencies, starts Flask, and opens the browser. Live API features require the user to save their own subscription key outside the project. No key is included in the repository.
