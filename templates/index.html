@@ -60,12 +60,12 @@
           </form>
           <div class="country-filter" id="country-filter" hidden>
             <label for="destination-country">Filter departures by country</label>
-            <select id="destination-country" name="country">
-              <option value="">All countries</option>
+            <input id="destination-country" name="country" type="search" list="destination-countries" placeholder="Type a country name" autocomplete="off">
+            <datalist id="destination-countries">
               {% for country in destination_countries %}
               <option value="{{ country }}">{{ country }}</option>
               {% endfor %}
-            </select>
+            </datalist>
           </div>
           <section class="arrival-results" id="arrival-results" aria-live="polite" hidden>
             <h3 id="results-title">Arrival results</h3>

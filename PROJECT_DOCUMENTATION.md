@@ -70,7 +70,7 @@ The departures client builds an OData query using a filter in this form:
 airport eq 'ARN' and scheduled eq 'YYMMDD' and flightType eq 'D'
 ```
 
-The date is formatted as required by the documented query example. The request also asks for up to 1,000 records so that the page can paginate the returned set locally in groups of 50. The country dropdown is populated from country names in `city_country.json`. Flask maps each returned destination IATA code to the local lookup and filters the departure records by the selected country.
+The date is formatted as required by the documented query example. The request also asks for up to 1,000 records so that the page can paginate the returned set locally in groups of 50. The country search field offers suggestions populated from country names in `city_country.json`. The user can type a country name and choose a matching suggestion. Flask maps each returned destination IATA code to the local lookup and filters the departure records by the entered country.
 
 ### API connection check
 
@@ -96,7 +96,7 @@ Earlier manual checks confirmed that the Flask page and its CSS, JavaScript, and
 | Starting from the parent folder made `.venv` paths fail. | The Windows launcher changes to its own project directory before using the environment. |
 | Raw JSON was difficult to read. | JavaScript turns available response fields into readable flight cards. |
 | Some flight records omit optional values. | The renderer only displays optional details when the API provides them. The status badge shows the status returned by the API, including “Deleted” when that is the returned status. |
-| No documented country field was available for the interface's country dropdown. | A local JSON airport-to-country lookup was added. It is explicitly limited to the airport codes it contains. |
+| No documented country field was available for the interface's country search. | A local JSON airport-to-country lookup was added. It is explicitly limited to the airport codes it contains. |
 | Windows may not have an IANA timezone database installed for Python's `ZoneInfo`. | The connection check uses the computer's local date, avoiding an extra timezone-data dependency. |
 | The browser could not contact the local app when Flask was not running. | The server must remain running while the browser is in use; the Windows launcher starts it and opens the page. |
 

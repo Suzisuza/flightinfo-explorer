@@ -277,7 +277,7 @@ h2 {
   font-weight: bold;
 }
 
-.country-filter select {
+.country-filter input {
   min-height: 40px;
   min-width: 220px;
   padding: 8px 12px;
@@ -466,7 +466,7 @@ h2 {
 .flight-mode-tab:focus-visible,
 .search-button:focus-visible,
 .arrival-search input:focus-visible,
-.country-filter select:focus-visible,
+.country-filter input:focus-visible,
 .feature-action-button:focus-visible {
   outline: 3px solid #174f75;
   outline-offset: 3px;

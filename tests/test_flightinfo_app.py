@@ -58,6 +58,9 @@ class HomePageTests(unittest.TestCase):
             self.assertNotIn("OData query", page)
             self.assertIn("Filter departures by country", page)
             self.assertIn('id="destination-country"', page)
+            self.assertIn('type="search"', page)
+            self.assertIn('list="destination-countries"', page)
+            self.assertIn('<datalist id="destination-countries">', page)
             self.assertIn('id="check-api-button"', page)
             self.assertNotIn("Quick demo", page)
             self.assertNotIn("In development", page)
@@ -173,7 +176,7 @@ class HomePageTests(unittest.TestCase):
             self.assertIn(".arrival-list", css)
             self.assertIn(".flight-mode-tab[aria-selected=\"true\"]", css)
             self.assertIn(".flight-pagination[hidden]", css)
-            self.assertIn(".country-filter select", css)
+            self.assertIn(".country-filter input", css)
             self.assertIn(".pagination-button", css)
             hover_rule = css.split(".airport-chip:hover {", 1)[1].split("}", 1)[0]
             self.assertIn("background-color: gold", hover_rule)

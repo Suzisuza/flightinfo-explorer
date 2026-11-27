@@ -43,7 +43,7 @@ The first run of the launcher needs an internet connection to install Flask. If 
 
 Arrivals use the documented FlightInfo v2 arrivals operation. Departures use the documented OData query operation, filtering by airport, scheduled date, and departure type. The browser sends the selected airport, date, and optional destination country to Flask; Python adds the subscription key and contacts the Swedavia API.
 
-The destination country filter uses `data/city_country.json` to map returned destination IATA codes to city and country names. This is a curated starter lookup, not a complete or official Swedavia route list. Destinations missing from the file cannot be identified or included in a country filter.
+For departures, type a country name in the country search field and select a matching suggestion. The field uses `data/city_country.json` to map returned destination IATA codes to city and country names. This is a curated starter lookup, not a complete or official Swedavia route list. Destinations missing from the file cannot be identified or included in a country filter.
 
 The **Check connection** control makes one small authenticated public OData request and reports whether the API responds. It is a live connectivity check and therefore requires a valid key and internet access. It does not call the portal's separate `heartBeat` operation, which is documented as internal use only.
 
