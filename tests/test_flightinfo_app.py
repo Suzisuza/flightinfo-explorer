@@ -64,11 +64,14 @@ class HomePageTests(unittest.TestCase):
             self.assertIn("Search destination or country", page)
             self.assertIn('id="destination-country"', page)
             self.assertIn('type="search"', page)
-            self.assertIn('list="destination-options"', page)
-            self.assertIn('<datalist id="destination-options">', page)
-            self.assertIn('value="Amsterdam, Netherlands"', page)
-            self.assertIn('value="Aalborg, Denmark"', page)
-            self.assertIn('value="Agadir, Morocco"', page)
+            self.assertIn('aria-controls="destination-options"', page)
+            self.assertIn('<ul class="destination-suggestions" id="destination-options" role="listbox" hidden></ul>', page)
+            self.assertIn('id="destination-options-data"', page)
+            self.assertNotIn("<datalist", page)
+            self.assertNotIn("(tom), Greece", page)
+            self.assertIn('"Amsterdam, Netherlands"', page)
+            self.assertIn('"Aalborg, Denmark"', page)
+            self.assertIn('"Agadir, Morocco"', page)
             self.assertIn('id="check-api-button"', page)
             self.assertNotIn("Quick demo", page)
             self.assertNotIn("In development", page)
@@ -81,8 +84,8 @@ class HomePageTests(unittest.TestCase):
         response = self.client.get("/")
         try:
             page = response.get_data(as_text=True)
-            self.assertEqual(len(DESTINATIONS), 255)
-            self.assertEqual(page.count('<option value="'), len(DESTINATION_SEARCH_OPTIONS))
+            self.assertEqual(len(DESTINATIONS), 254)
+            self.assertEqual(len(DESTINATION_SEARCH_OPTIONS), len(DESTINATIONS) + len({item["country"] for item in DESTINATIONS}))
             self.assertEqual(
                 {destination["continent"] for destination in DESTINATIONS},
                 {"Europe", "Africa", "Asia", "North America", "South America"},
@@ -303,6 +306,8 @@ class HomePageTests(unittest.TestCase):
             script = response.get_data(as_text=True)
             self.assertIn("const flightsPerPage = 50", script)
             self.assertIn("function renderFlightPage()", script)
+            self.assertIn("normalizeSuggestion(option).startsWith(searchText)", script)
+            self.assertIn("if (!searchText) return", script)
         finally:
             response.close()
 

@@ -36,7 +36,7 @@ result count of one.
 
 data/city_country.json
 This JSON file stores airport display names and destination suggestions based
-on Swedavia's 2025 destination statistics. It includes 255 city-country pairs
+on Swedavia's 2025 destination statistics. It includes 254 city-country pairs
 in 51 countries: all European destinations listed in that source and selected
 destinations in Africa, Asia, North America, and South America. The source
 does not list an Oceania destination with passenger traffic in 2025. Historical
@@ -45,8 +45,8 @@ statistics do not guarantee a route operates on a selected travel date.
 templates/index.html
 This file defines the page structure: airport choices, Arrivals and Departures
 tabs, date field, destination search, results area, and API connection controls.
-The destination search uses an HTML datalist whose suggestions narrow as the
-user types.
+The destination search stays closed when empty and shows only country or city
+names that begin with the entered text.
 
 static/flight_search.js
 This file handles page interactions. It changes the selected flight

@@ -60,12 +60,11 @@
           </form>
           <div class="country-filter" id="country-filter" hidden>
             <label for="destination-country">Search destination or country</label>
-            <input id="destination-country" name="destination" type="search" list="destination-options" placeholder="Type a destination or country" autocomplete="off">
-            <datalist id="destination-options">
-              {% for option in destination_search_options %}
-              <option value="{{ option }}">
-              {% endfor %}
-            </datalist>
+            <div class="destination-search-wrap">
+              <input id="destination-country" name="destination" type="search" placeholder="Type a destination or country" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="destination-options">
+              <ul class="destination-suggestions" id="destination-options" role="listbox" hidden></ul>
+            </div>
+            <script type="application/json" id="destination-options-data">{{ destination_search_options|tojson }}</script>
           </div>
           <section class="arrival-results" id="arrival-results" aria-live="polite" hidden>
             <h3 id="results-title">Arrival results</h3>

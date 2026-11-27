@@ -288,6 +288,49 @@ h2 {
   font: inherit;
 }
 
+.destination-search-wrap {
+  position: relative;
+  width: min(420px, 100%);
+}
+
+.destination-search-wrap input {
+  width: 100%;
+}
+
+.destination-suggestions {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 4px);
+  right: 0;
+  left: 0;
+  max-height: 260px;
+  margin: 0;
+  padding: 5px;
+  overflow-y: auto;
+  border: 1px solid #75c6dd;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 8px 18px #17334d24;
+  color: black;
+  list-style: none;
+}
+
+.destination-suggestions[hidden] {
+  display: none;
+}
+
+.destination-suggestions li {
+  padding: 9px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.destination-suggestions li:hover,
+.destination-suggestions li[aria-selected="true"] {
+  background: #e3f4fa;
+}
+
 .arrival-results {
   margin-top: 20px;
   padding: 16px;

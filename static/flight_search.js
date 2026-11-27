@@ -17,6 +17,10 @@ const nextPageButton = document.querySelector("#next-page");
 const paginationInfo = document.querySelector("#pagination-info");
 const destinationFilterPanel = document.querySelector("#country-filter");
 const destinationSearchInput = document.querySelector("#destination-country");
+const destinationSuggestionList = document.querySelector("#destination-options");
+const destinationOptions = JSON.parse(
+  document.querySelector("#destination-options-data").textContent,
+);
 const apiStatusText = document.querySelector("#api-status-text");
 const checkApiButton = document.querySelector("#check-api-button");
 
@@ -25,6 +29,7 @@ let selectedMode = "arrivals";
 let sortedFlights = [];
 let currentPage = 0;
 const flightsPerPage = 50;
+let activeSuggestionIndex = -1;
 
 const airportNames = {
   ARN: "Stockholm Arlanda",
@@ -48,6 +53,64 @@ function readField(object, ...names) {
     if (value !== undefined && value !== null && value !== "") return value;
   }
   return "";
+}
+
+function normalizeSuggestion(value) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase();
+}
+
+function closeDestinationSuggestions() {
+  destinationSuggestionList.hidden = true;
+  destinationSearchInput.setAttribute("aria-expanded", "false");
+  destinationSearchInput.removeAttribute("aria-activedescendant");
+  activeSuggestionIndex = -1;
+}
+
+function setActiveDestinationSuggestion(index) {
+  const suggestions = destinationSuggestionList.querySelectorAll('[role="option"]');
+  if (!suggestions.length) return;
+
+  activeSuggestionIndex = (index + suggestions.length) % suggestions.length;
+  suggestions.forEach((suggestion, suggestionIndex) => {
+    const isActive = suggestionIndex === activeSuggestionIndex;
+    suggestion.setAttribute("aria-selected", String(isActive));
+    if (isActive) {
+      destinationSearchInput.setAttribute("aria-activedescendant", suggestion.id);
+      suggestion.scrollIntoView({ block: "nearest" });
+    }
+  });
+}
+
+function chooseDestinationSuggestion(value) {
+  destinationSearchInput.value = value;
+  closeDestinationSuggestions();
+  destinationSearchInput.focus();
+}
+
+function renderDestinationSuggestions() {
+  const searchText = normalizeSuggestion(destinationSearchInput.value.trim());
+  destinationSuggestionList.replaceChildren();
+  closeDestinationSuggestions();
+  if (!searchText) return;
+
+  const matchingOptions = destinationOptions.filter((option) =>
+    normalizeSuggestion(option).startsWith(searchText),
+  );
+  if (!matchingOptions.length) return;
+
+  matchingOptions.forEach((option, index) => {
+    const item = document.createElement("li");
+    item.id = `destination-suggestion-${index}`;
+    item.setAttribute("role", "option");
+    item.setAttribute("aria-selected", "false");
+    item.textContent = option;
+    item.addEventListener("mousedown", (event) => event.preventDefault());
+    item.addEventListener("click", () => chooseDestinationSuggestion(option));
+    destinationSuggestionList.append(item);
+  });
+
+  destinationSuggestionList.hidden = false;
+  destinationSearchInput.setAttribute("aria-expanded", "true");
 }
 
 function getTimeValues(flight) {
@@ -277,8 +340,36 @@ nextPageButton.addEventListener("click", () => {
   }
 });
 
+destinationSearchInput.addEventListener("input", renderDestinationSuggestions);
+destinationSearchInput.addEventListener("keydown", (event) => {
+  const suggestionsAreOpen = !destinationSuggestionList.hidden;
+  const lastIndex = destinationSuggestionList.querySelectorAll('[role="option"]').length - 1;
+
+  if (event.key === "ArrowDown" && destinationSearchInput.value.trim()) {
+    event.preventDefault();
+    if (!suggestionsAreOpen) renderDestinationSuggestions();
+    setActiveDestinationSuggestion(activeSuggestionIndex + 1);
+  } else if (event.key === "ArrowUp" && suggestionsAreOpen) {
+    event.preventDefault();
+    setActiveDestinationSuggestion(activeSuggestionIndex < 0 ? lastIndex : activeSuggestionIndex - 1);
+  } else if (event.key === "Enter" && suggestionsAreOpen && activeSuggestionIndex >= 0) {
+    event.preventDefault();
+    const suggestion = destinationSuggestionList.querySelectorAll('[role="option"]')[activeSuggestionIndex];
+    chooseDestinationSuggestion(suggestion.textContent);
+  } else if (event.key === "Escape") {
+    closeDestinationSuggestions();
+  }
+});
+
+document.addEventListener("click", (event) => {
+  if (!destinationSearchInput.parentElement.contains(event.target)) {
+    closeDestinationSuggestions();
+  }
+});
+
 flightForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+  closeDestinationSuggestions();
   resultsPanel.hidden = false;
   resultsTitle.textContent = `${selectedMode === "arrivals" ? "Arrivals" : "Departures"} results`;
   resultMessage.textContent = `Loading ${selectedMode}...`;
